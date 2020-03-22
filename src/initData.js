@@ -78,7 +78,52 @@ let initOpt = {
     initHeight: 870,
 };
 
+let animation = {
+    logoAnimTime: null,
+    logoDuration: 1000,
+    logoStart: -600,
+    logoTrack: 650,
+    stairsStart: -100,
+    stairsDuration: 300,
+    buildAnimTime: null,
+    menuMovingFlag: false,
+    rangeOfRotation: -Math.PI/180*170,
+    btnPace: 1.002,
+    btnCurentRatio: 1,
+    btnRangeRatio: 1.15,
+};
 
+let menuCircle = {
+    speed: -0.05,
+    acceleration: 1.035,
+    centerX: 1100,
+    centerY: 550,
+    R: 410,
+    direction: 1,
+    stairs: [
+        {
+            nameMenu: "menu_ex1",
+            nameStair: "new_1",
+            alignMenu: [-40,-100],
+            alignStairs: [835, 90],
+            initAngle: Math.PI/180*30
+        },
+        {
+            nameMenu: "menu_ex2",
+            nameStair: "new_2",
+            alignMenu: [-40,-135],
+            alignStairs: [835, 100],
+            initAngle: Math.PI/180*55
+        },
+        {
+            nameMenu: "menu_ex3",
+            nameStair: "new_3",
+            alignMenu: [-42,-62],
+            alignStairs: [850, 55],
+            initAngle: Math.PI/180*80
+        }
+    ],
+    rangeAngle: Math.PI/180*60
+};
 
-//export {arrImg, initOpt, animation, menuCircle};
-export {arrImg, initOpt};
+export {arrImg, initOpt, animation, menuCircle};

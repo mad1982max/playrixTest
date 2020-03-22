@@ -2,22 +2,16 @@
     box-sizing: border-box;
     padding: 0; 
     margin: 0;
-    overflow: hidden;
 }
 
-/* body, html {
+body, html {
     width: 100%;
     height: 100%;
     background-color: #111;
     overflow: hidden;
-} */
-
-body {
-    height: 100vh;
 }
 
 #wrapper {
-    width: 100%;
+    max-width: 1240px;
     margin: auto;
-    height: 100%;
 }
