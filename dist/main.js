@@ -46960,7 +46960,6 @@ var textureObj = {
     zIndex: 10
   }
 };
-var currentObj;
 var menuContainer = [];
 menuContainer.counter = 0;
 var scaleFactor = 1;
@@ -47033,6 +47032,7 @@ var GameArea = /*#__PURE__*/function () {
       this.insertTexture("dec_2", resources, this.container);
       this.insertTexture("btn", resources, this.container);
       this.insertTexture("logo", resources, this.container);
+      console.log(this.container);
       var centerX = Math.floor(0.5 * (this.app.view.width / scaleFactor - this.btn.width));
       this.btn.x = centerX;
       _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].logoAnimTime = Date.now();
@@ -47123,8 +47123,6 @@ var GameArea = /*#__PURE__*/function () {
         containerMenu.on('tap', function (e) {
           return _this2.clickOnMenu.call(_this2, e, resources);
         });
-        containerMenu.on('mouseover', this.overMenuItem);
-        containerMenu.on('mouseout', this.outMenuItem);
         this.container.addChild(containerMenu);
         var menu_ex = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"](resources[nameMenu].texture);
         menu_ex.name = "texture";
@@ -47133,18 +47131,6 @@ var GameArea = /*#__PURE__*/function () {
         containerMenu.addChild(menu_ex);
         menuContainer.push(containerMenu);
       }
-    }
-  }, {
-    key: "outMenuItem",
-    value: function outMenuItem() {// currentObj.tint = 0xffffff;
-      // currentObj = null;
-    }
-  }, {
-    key: "overMenuItem",
-    value: function overMenuItem(e) {// let container = e.target;
-      // let child = container.children[1];
-      // currentObj = child;
-      // child.tint = 0x8EF013;     
     }
   }, {
     key: "createCircleGrad",
@@ -47170,8 +47156,7 @@ var GameArea = /*#__PURE__*/function () {
     key: "changeStairs",
     value: function changeStairs(e, resources) {
       finishBuildStair = true;
-      this.ok.visible = false; // this.container.addChild(this.final_l1);
-
+      this.ok.visible = false;
       this.showFinal(resources);
     }
   }, {
@@ -47235,8 +47220,8 @@ var GameArea = /*#__PURE__*/function () {
       var currentContainer = e.target;
       currentContainer.isChecked = true;
 
-      if (this.newL) {
-        this.newL.destroy();
+      if (this.newStairs) {
+        this.newStairs.destroy();
       }
 
       if (this.old) {
@@ -47252,16 +47237,16 @@ var GameArea = /*#__PURE__*/function () {
       var currentStair = _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].stairs.find(function (item) {
         return item.nameStair === currentContainer.name;
       });
-      this.newL = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"](resources[e.target.name].texture);
-      this.newL.isCreated = true;
+      this.newStairs = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"](resources[e.target.name].texture);
+      this.newStairs.isCreated = true;
       _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].buildAnimTime = new Date();
-      this.newL.initX = currentStair.alignStairs[0];
-      this.newL.initY = currentStair.alignStairs[1];
-      this.newL.position.set(currentStair.alignStairs[0], _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].stairsStart);
-      this.newL.zIndex = 2;
-      this.newL.alpha = 0;
-      this.newL.animationEnd = false;
-      this.container.addChild(this.newL);
+      this.newStairs.initX = currentStair.alignStairs[0];
+      this.newStairs.initY = currentStair.alignStairs[1];
+      this.newStairs.position.set(currentStair.alignStairs[0], _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].stairsStart);
+      this.newStairs.zIndex = 2;
+      this.newStairs.alpha = 0;
+      this.newStairs.animationEnd = false;
+      this.container.addChild(this.newStairs);
     }
   }, {
     key: "showMenu",
@@ -47307,14 +47292,14 @@ var GameArea = /*#__PURE__*/function () {
   }, {
     key: "newStairsAppear",
     value: function newStairsAppear() {
-      if (this.newL && this.newL.isCreated && !this.newL.animationEnd) {
+      if (this.newStairs && this.newStairs.isCreated && !this.newStairs.animationEnd) {
         var currentTime = Date.now();
         var d = currentTime - _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].buildAnimTime;
-        if (this.newL.alpha < 1) this.newL.alpha += 0.05;
-        this.newL.y = Math.floor(Object(_easeFn__WEBPACK_IMPORTED_MODULE_2__["easeInQuart"])(d, _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].stairsStart, this.newL.initY - _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].stairsStart, _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].stairsDuration));
+        if (this.newStairs.alpha < 1) this.newStairs.alpha += 0.05;
+        this.newStairs.y = Math.floor(Object(_easeFn__WEBPACK_IMPORTED_MODULE_2__["easeInQuart"])(d, _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].stairsStart, this.newStairs.initY - _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].stairsStart, _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].stairsDuration));
 
         if (d >= _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].stairsDuration) {
-          this.newL.animationEnd = true;
+          this.newStairs.animationEnd = true;
         }
       }
     }

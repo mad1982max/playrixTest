@@ -71,10 +71,8 @@ const textureObj = {
         rangeRatio: 1.15,
         zIndex: 10,
     }
-
 }
 
-let currentObj;
 let menuContainer = [];
 menuContainer.counter = 0;
 let scaleFactor = 1;
@@ -143,6 +141,9 @@ class GameArea {
         this.insertTexture("dec_2", resources, this.container);
         this.insertTexture("btn", resources, this.container);
         this.insertTexture("logo", resources, this.container);
+
+        console.log(this.container);
+        
         
         let centerX = Math.floor(0.5*(this.app.view.width/scaleFactor - this.btn.width));
         this.btn.x = centerX;
@@ -231,9 +232,7 @@ class GameArea {
             containerMenu.buttonMode = true;
             containerMenu.on('click', (e) => this.clickOnMenu.call(this, e, resources));
             containerMenu.on('tap', (e) => this.clickOnMenu.call(this, e, resources));
-            containerMenu.on('mouseover', this.overMenuItem);
-            containerMenu.on('mouseout', this.outMenuItem);
-                       
+              
             this.container.addChild(containerMenu);              
 
             let menu_ex = new PIXI.Sprite(resources[nameMenu].texture);
@@ -244,18 +243,6 @@ class GameArea {
             containerMenu.addChild(menu_ex);
             menuContainer.push(containerMenu); 
         }
-    }
-
-    outMenuItem() {
-        // currentObj.tint = 0xffffff;
-        // currentObj = null;
-    } 
-
-    overMenuItem(e) {
-        // let container = e.target;
-        // let child = container.children[1];
-        // currentObj = child;
-        // child.tint = 0x8EF013;     
     }
 
     createCircleGrad(r, color1, color2) {
@@ -280,7 +267,6 @@ class GameArea {
     changeStairs(e, resources) {
         finishBuildStair = true;
         this.ok.visible = false;
-        // this.container.addChild(this.final_l1);
         this.showFinal(resources);
     }
 
@@ -329,17 +315,16 @@ class GameArea {
         let currentContainer = e.target;
         currentContainer.isChecked = true;
 
-        if(this.newL) {
-            this.newL.destroy();
+        if(this.newStairs) {
+            this.newStairs.destroy();
         }
 
         if(this.old) {
-            this.container.removeChild(this.old);            
+            this.container.removeChild(this.old);
+                        
         }
-
         
-        this.colorizeChekedMenu(currentContainer);
-        
+        this.colorizeChekedMenu(currentContainer);       
                   
         this.ok.visible = true;
         this.ok.name = e.target.name;
@@ -349,16 +334,16 @@ class GameArea {
 
         let currentStair = menuCircle.stairs.find(item => item.nameStair === currentContainer.name);
 
-        this.newL = new PIXI.Sprite(resources[e.target.name].texture);
-        this.newL.isCreated = true;
+        this.newStairs = new PIXI.Sprite(resources[e.target.name].texture);
+        this.newStairs.isCreated = true;
         animation.buildAnimTime = new Date();
-        this.newL.initX = currentStair.alignStairs[0];
-        this.newL.initY = currentStair.alignStairs[1];
-        this.newL.position.set(currentStair.alignStairs[0], animation.stairsStart);
-        this.newL.zIndex = 2;
-        this.newL.alpha = 0;
-        this.newL.animationEnd = false;
-        this.container.addChild(this.newL);      
+        this.newStairs.initX = currentStair.alignStairs[0];
+        this.newStairs.initY = currentStair.alignStairs[1];
+        this.newStairs.position.set(currentStair.alignStairs[0], animation.stairsStart);
+        this.newStairs.zIndex = 2;
+        this.newStairs.alpha = 0;
+        this.newStairs.animationEnd = false;
+        this.container.addChild(this.newStairs);      
     }
 
     showMenu() {
@@ -399,13 +384,13 @@ class GameArea {
     }
 
     newStairsAppear() {
-        if (this.newL && this.newL.isCreated && !this.newL.animationEnd) {
+        if (this.newStairs && this.newStairs.isCreated && !this.newStairs.animationEnd) {
             let currentTime = Date.now();
             let d = currentTime - animation.buildAnimTime;
-            if (this.newL.alpha < 1) this.newL.alpha +=0.05;            
-            this.newL.y = Math.floor(easeInQuart(d, animation.stairsStart, this.newL.initY - animation.stairsStart, animation.stairsDuration));
+            if (this.newStairs.alpha < 1) this.newStairs.alpha +=0.05;            
+            this.newStairs.y = Math.floor(easeInQuart(d, animation.stairsStart, this.newStairs.initY - animation.stairsStart, animation.stairsDuration));
             if (d >= animation.stairsDuration) {
-                this.newL.animationEnd = true;
+                this.newStairs.animationEnd = true;
             }
         }
     }
