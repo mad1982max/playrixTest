@@ -1,77 +1,8 @@
 import * as PIXI from 'pixi.js';
-import {arrImg, initOpt, animation, menuCircle} from './initData';
+import {arrImg, initOpt, animation, menuCircle, textureObj} from './initData';
 import {easeOutSine, easeInQuart} from './easeFn';
 
 PIXI.utils.sayHello(PIXI.utils.isWebGLSupported() ? "WebGL": "CANVAS");
-
-
-const textureObj = {
-    bg: {
-        name: "bg",
-        x: -1100,
-        y: -500,
-        zIndex: 1
-    },
-    austin: {
-        name: "austin",
-        x: 600,
-        y: 170,
-        zIndex: 2
-    },
-    ok: {
-        name: "ok",
-        x: 200,
-        y: 200,
-        alpha: 0,
-        visible: false,
-        zIndex: 8,
-        buttonMode: true,
-        interactive: true
-    }, 
-    hummer: {
-        name: "hummer",
-        position: [1020,300],
-        alpha: 0,
-        visible: false,
-        alphaPace: 0.03,
-        zIndex: 3,
-        buttonMode: true,
-        interactive: true
-    },
-
-    dec_1: {
-        name: "dec_1",
-        position: [1020,520],
-        zindex: 3,
-
-    },
-    dec_2: {
-        name: "dec_2",
-        zIndex: 2,
-    },
-    logo: {
-        name: "logo",
-        position: [-400,25],
-        zIndex: 3,
-        animationEnd: false
-    },
-    old: {
-        name: "old",
-        position: [735,135],
-        zIndex: 2
-    },
-    btn: {
-        name: "btn",
-        position: [0, 700],
-        buttonMode: true,
-        interactive: true,
-        pace: 1.002,
-        increaseFlag: true,
-        curentRatio: 1,
-        rangeRatio: 1.15,
-        zIndex: 10,
-    }
-}
 
 let menuContainer = [];
 menuContainer.counter = 0;
@@ -93,6 +24,7 @@ class GameArea {
             autoResize: true,
             resolution: window.devicePixelRatio || 1
         };
+
 
         this.app = new PIXI.Application(this.options);        
         this.container = new PIXI.Container();
@@ -130,34 +62,27 @@ class GameArea {
     }
 
     loader(loader, resources) {
-        
-        
+        let textureToLoadArr = ["bg", "austin", "ok", "hummer", "dec_1", "dec_2", "btn", "logo", "old"];
 
-        this.insertTexture("bg", resources, this.container);
-        this.insertTexture("austin", resources, this.container);
-        this.insertTexture("ok", resources, this.container);
-        this.insertTexture("hummer", resources, this.container);
-        this.insertTexture("dec_1", resources, this.container);
-        this.insertTexture("dec_2", resources, this.container);
-        this.insertTexture("btn", resources, this.container);
-        this.insertTexture("logo", resources, this.container);
-
-        console.log(this.container);
+        for (let texture of textureToLoadArr) {
+            this.insertTexture(texture, resources, this.container)
+        }
         
-        
-        let centerX = Math.floor(0.5*(this.app.view.width/scaleFactor - this.btn.width));
+        let centerX = Math.floor(0.5*(this.app.view.width/scaleFactor/this.options.resolution - this.btn.width));
         this.btn.x = centerX;
 
         animation.logoAnimTime = Date.now();
+
         this.btn.on('tap', () => console.log('continue'));
         this.btn.on('click', () => console.log('continue'));
 
         this.ok.on('click', (e) => {
             this.changeStairs(e, resources);
-        })
+        });
         this.ok.on('tap', (e) => {
             this.changeStairs(e, resources);
-        })
+        });
+
         this.hummer.on('click', () => {
             this.hummer.visible = false;
             this.showMenu();
@@ -166,8 +91,6 @@ class GameArea {
             this.hummer.visible = false;
             this.showMenu();
         })
-
-        this.insertTexture("old", resources, this.container);
 
         this.createMenu(resources);            
         this.app.ticker.add(this.ticker.bind(this));
@@ -271,20 +194,18 @@ class GameArea {
     }
 
     showFinal(resources) {
-        this.final_l2 = new PIXI.Sprite(resources.final_l2.texture);
-        this.final_l2.height = this.app.view.height/scaleFactor
-        this.final_l2.position.set(0,0);
-        this.final_l2.zIndex = 9;
-        this.final_l2.alpha = 0;
-        this.container.addChild(this.final_l2);
+        let finalArr = ["final_l2", "final_l1"];
 
-        this.final_l1 = new PIXI.Sprite(resources.final_l1.texture);
-        let centerXfinal = Math.floor(this.app.view.width/scaleFactor/2-this.final_l1.width/2);
-        let centerYfinal = Math.floor(this.app.view.height/scaleFactor/2-this.final_l1.height/2);
+        for(let finalSceneTexture of finalArr) {
+            this.insertTexture(finalSceneTexture, resources, this.container)
+        }
+
+        this.final_l2.height = this.app.view.height/scaleFactor/this.options.resolution;
+
+        let centerXfinal = Math.floor(0.5*(this.app.view.width/scaleFactor/this.options.resolution-this.final_l1.width));
+        let centerYfinal = Math.floor(0.5*(this.app.view.height/scaleFactor/this.options.resolution-this.final_l1.height));
         this.final_l1.position.set(centerXfinal,centerYfinal);
-        this.final_l1.zIndex = 10;
-        this.final_l1.alpha = 0;
-        this.container.addChild(this.final_l1);
+        
         finalBuildFlag = true;
     }
 
@@ -370,13 +291,13 @@ class GameArea {
         let multer = this.btn.increaseFlag ? this.btn.pace : 1/this.btn.pace
         this.btn.curentRatio *= multer;
         this.btn.scale.set(this.btn.curentRatio.toFixed(3));
-        let centerX = Math.floor(this.app.view.width/scaleFactor/2-this.btn.width/2);
-        this.btn.position.set(centerX, 700);         
+        let centerX = Math.floor(0.5*(this.app.view.width/scaleFactor/this.options.resolution-this.btn.width));
+        this.btn.x = centerX;         
     }
 
     okAppear() {
         if(this.ok.shadeOut) {
-            this.ok.alpha += 0.04
+            this.ok.alpha += this.ok.alphaSpeed
             if(this.ok.alpha > 1) {
                 this.ok.shadeOut = false;                
             }
@@ -444,17 +365,14 @@ class GameArea {
 
     finalAppear() {
         if (finalBuildFlag) {
-
-            let incr1 = 0.03;
-            let incr2 = 0.03;
-            if (this.final_l2.alpha >= 0.8 && this.final_l1.alpha >= 1) {
+            if (this.final_l2.alpha >= this.final_l2.edgeAlpha && this.final_l1.alpha >= 1) {
                 finalBuildFlag = false;
                 return
             }
-            if (this.final_l2.alpha >= 0.8) incr2 = 0;
-            if (this.final_l1.alpha >= 1) incr1 = 0;
-            this.final_l1.alpha += incr1;
-            this.final_l2.alpha += incr2;
+            if (this.final_l2.alpha >= 0.8) this.final_l2.increment = 0;
+            if (this.final_l1.alpha >= 1) this.final_l1.increment = 0;
+            this.final_l1.alpha += this.final_l1.increment;
+            this.final_l2.alpha += this.final_l2.increment;
         }
     }
 
@@ -469,36 +387,6 @@ class GameArea {
         this.finalAppear();        
     }
 
-
-    // resize() {
-    //     console.log(window.innerWidth, window.innerHeight);
-
-    //     // this.app.renderer.resize(window.innerWidth, window.innerHeight);
-
-    //     if(window.innerWidth > window.innerHeight) {
-    //         console.log('w > h');
-            
-    //     } else {
-    //         console.log('h > w');
-    //         if(window.innerWidth <= 320) {
-    //             initPosition.bg.point = [-800, -240]
-    //             initPosition.bg.scale = 0.55
-    //             console.log(this.wrapper.style.width );
-    //             if(window.innerHeight >= 567) {
-    //                 this.wrapper.style.height = `568px`;
-    //             }
-    //         }
-            
-            
-    //     }
-
-
-
-    
-
-                
-        
-    // }
 }
 
 const game = new GameArea();

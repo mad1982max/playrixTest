@@ -46895,71 +46895,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 pixi_js__WEBPACK_IMPORTED_MODULE_0__["utils"].sayHello(pixi_js__WEBPACK_IMPORTED_MODULE_0__["utils"].isWebGLSupported() ? "WebGL" : "CANVAS");
-var textureObj = {
-  bg: {
-    name: "bg",
-    x: -1100,
-    y: -500,
-    zIndex: 1
-  },
-  austin: {
-    name: "austin",
-    x: 600,
-    y: 170,
-    zIndex: 2
-  },
-  ok: {
-    name: "ok",
-    x: 200,
-    y: 200,
-    alpha: 0,
-    visible: false,
-    zIndex: 8,
-    buttonMode: true,
-    interactive: true
-  },
-  hummer: {
-    name: "hummer",
-    position: [1020, 300],
-    alpha: 0,
-    visible: false,
-    alphaPace: 0.03,
-    zIndex: 3,
-    buttonMode: true,
-    interactive: true
-  },
-  dec_1: {
-    name: "dec_1",
-    position: [1020, 520],
-    zindex: 3
-  },
-  dec_2: {
-    name: "dec_2",
-    zIndex: 2
-  },
-  logo: {
-    name: "logo",
-    position: [-400, 25],
-    zIndex: 3,
-    animationEnd: false
-  },
-  old: {
-    name: "old",
-    position: [735, 135],
-    zIndex: 2
-  },
-  btn: {
-    name: "btn",
-    position: [0, 700],
-    buttonMode: true,
-    interactive: true,
-    pace: 1.002,
-    increaseFlag: true,
-    curentRatio: 1,
-    rangeRatio: 1.15,
-    zIndex: 10
-  }
-};
 var menuContainer = [];
 menuContainer.counter = 0;
 var scaleFactor = 1;
@@ -46998,7 +46933,7 @@ var GameArea = /*#__PURE__*/function () {
     value: function insertTexture(name, resources, parent) {
       var _this$name$element;
 
-      var texture = textureObj[name];
+      var texture = _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"][name];
       var keys = Object.keys(texture);
       this[name] = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"](resources[name].texture);
 
@@ -47024,16 +46959,14 @@ var GameArea = /*#__PURE__*/function () {
     value: function loader(_loader, resources) {
       var _this = this;
 
-      this.insertTexture("bg", resources, this.container);
-      this.insertTexture("austin", resources, this.container);
-      this.insertTexture("ok", resources, this.container);
-      this.insertTexture("hummer", resources, this.container);
-      this.insertTexture("dec_1", resources, this.container);
-      this.insertTexture("dec_2", resources, this.container);
-      this.insertTexture("btn", resources, this.container);
-      this.insertTexture("logo", resources, this.container);
-      console.log(this.container);
-      var centerX = Math.floor(0.5 * (this.app.view.width / scaleFactor - this.btn.width));
+      var textureToLoadArr = ["bg", "austin", "ok", "hummer", "dec_1", "dec_2", "btn", "logo", "old"];
+
+      for (var _i2 = 0, _textureToLoadArr = textureToLoadArr; _i2 < _textureToLoadArr.length; _i2++) {
+        var texture = _textureToLoadArr[_i2];
+        this.insertTexture(texture, resources, this.container);
+      }
+
+      var centerX = Math.floor(0.5 * (this.app.view.width / scaleFactor / this.options.resolution - this.btn.width));
       this.btn.x = centerX;
       _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].logoAnimTime = Date.now();
       this.btn.on('tap', function () {
@@ -47058,7 +46991,6 @@ var GameArea = /*#__PURE__*/function () {
 
         _this.showMenu();
       });
-      this.insertTexture("old", resources, this.container);
       this.createMenu(resources);
       this.app.ticker.add(this.ticker.bind(this));
     }
@@ -47162,19 +47094,17 @@ var GameArea = /*#__PURE__*/function () {
   }, {
     key: "showFinal",
     value: function showFinal(resources) {
-      this.final_l2 = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"](resources.final_l2.texture);
-      this.final_l2.height = this.app.view.height / scaleFactor;
-      this.final_l2.position.set(0, 0);
-      this.final_l2.zIndex = 9;
-      this.final_l2.alpha = 0;
-      this.container.addChild(this.final_l2);
-      this.final_l1 = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"](resources.final_l1.texture);
-      var centerXfinal = Math.floor(this.app.view.width / scaleFactor / 2 - this.final_l1.width / 2);
-      var centerYfinal = Math.floor(this.app.view.height / scaleFactor / 2 - this.final_l1.height / 2);
+      var finalArr = ["final_l2", "final_l1"];
+
+      for (var _i3 = 0, _finalArr = finalArr; _i3 < _finalArr.length; _i3++) {
+        var finalSceneTexture = _finalArr[_i3];
+        this.insertTexture(finalSceneTexture, resources, this.container);
+      }
+
+      this.final_l2.height = this.app.view.height / scaleFactor / this.options.resolution;
+      var centerXfinal = Math.floor(0.5 * (this.app.view.width / scaleFactor / this.options.resolution - this.final_l1.width));
+      var centerYfinal = Math.floor(0.5 * (this.app.view.height / scaleFactor / this.options.resolution - this.final_l1.height));
       this.final_l1.position.set(centerXfinal, centerYfinal);
-      this.final_l1.zIndex = 10;
-      this.final_l1.alpha = 0;
-      this.container.addChild(this.final_l1);
       finalBuildFlag = true;
     }
   }, {
@@ -47275,14 +47205,14 @@ var GameArea = /*#__PURE__*/function () {
       var multer = this.btn.increaseFlag ? this.btn.pace : 1 / this.btn.pace;
       this.btn.curentRatio *= multer;
       this.btn.scale.set(this.btn.curentRatio.toFixed(3));
-      var centerX = Math.floor(this.app.view.width / scaleFactor / 2 - this.btn.width / 2);
-      this.btn.position.set(centerX, 700);
+      var centerX = Math.floor(0.5 * (this.app.view.width / scaleFactor / this.options.resolution - this.btn.width));
+      this.btn.x = centerX;
     }
   }, {
     key: "okAppear",
     value: function okAppear() {
       if (this.ok.shadeOut) {
-        this.ok.alpha += 0.04;
+        this.ok.alpha += this.ok.alphaSpeed;
 
         if (this.ok.alpha > 1) {
           this.ok.shadeOut = false;
@@ -47360,18 +47290,15 @@ var GameArea = /*#__PURE__*/function () {
     key: "finalAppear",
     value: function finalAppear() {
       if (finalBuildFlag) {
-        var incr1 = 0.03;
-        var incr2 = 0.03;
-
-        if (this.final_l2.alpha >= 0.8 && this.final_l1.alpha >= 1) {
+        if (this.final_l2.alpha >= this.final_l2.edgeAlpha && this.final_l1.alpha >= 1) {
           finalBuildFlag = false;
           return;
         }
 
-        if (this.final_l2.alpha >= 0.8) incr2 = 0;
-        if (this.final_l1.alpha >= 1) incr1 = 0;
-        this.final_l1.alpha += incr1;
-        this.final_l2.alpha += incr2;
+        if (this.final_l2.alpha >= 0.8) this.final_l2.increment = 0;
+        if (this.final_l1.alpha >= 1) this.final_l1.increment = 0;
+        this.final_l1.alpha += this.final_l1.increment;
+        this.final_l2.alpha += this.final_l2.increment;
       }
     }
   }, {
@@ -47385,24 +47312,7 @@ var GameArea = /*#__PURE__*/function () {
       this.hummerAppear();
       this.finishedBuildStair();
       this.finalAppear();
-    } // resize() {
-    //     console.log(window.innerWidth, window.innerHeight);
-    //     // this.app.renderer.resize(window.innerWidth, window.innerHeight);
-    //     if(window.innerWidth > window.innerHeight) {
-    //         console.log('w > h');
-    //     } else {
-    //         console.log('h > w');
-    //         if(window.innerWidth <= 320) {
-    //             initPosition.bg.point = [-800, -240]
-    //             initPosition.bg.scale = 0.55
-    //             console.log(this.wrapper.style.width );
-    //             if(window.innerHeight >= 567) {
-    //                 this.wrapper.style.height = `568px`;
-    //             }
-    //         }
-    //     }
-    // }
-
+    }
   }]);
 
   return GameArea;
@@ -47416,7 +47326,7 @@ var game = new GameArea();
 /*!*************************!*\
   !*** ./src/initData.js ***!
   \*************************/
-/*! exports provided: arrImg, initOpt, animation, menuCircle */
+/*! exports provided: arrImg, initOpt, animation, menuCircle, textureObj */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -47425,6 +47335,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "initOpt", function() { return initOpt; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "animation", function() { return animation; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "menuCircle", function() { return menuCircle; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "textureObj", function() { return textureObj; });
 var arrImg = [{
   name: 'austin',
   url: './img/austin.png'
@@ -47497,6 +47408,87 @@ var animation = {
   btnPace: 1.002,
   btnCurentRatio: 1,
   btnRangeRatio: 1.15
+};
+var textureObj = {
+  bg: {
+    name: "bg",
+    x: -1100,
+    y: -500,
+    zIndex: 1
+  },
+  austin: {
+    name: "austin",
+    x: 600,
+    y: 170,
+    zIndex: 2
+  },
+  ok: {
+    name: "ok",
+    x: 200,
+    y: 200,
+    alpha: 0,
+    alphaSpeed: 0.04,
+    visible: false,
+    zIndex: 8,
+    buttonMode: true,
+    interactive: true
+  },
+  hummer: {
+    name: "hummer",
+    position: [1020, 300],
+    alpha: 0,
+    visible: false,
+    alphaPace: 0.03,
+    zIndex: 3,
+    buttonMode: true,
+    interactive: true
+  },
+  dec_1: {
+    name: "dec_1",
+    position: [1020, 520],
+    zIndex: 3
+  },
+  dec_2: {
+    name: "dec_2",
+    zIndex: 2
+  },
+  logo: {
+    name: "logo",
+    position: [-400, 25],
+    zIndex: 3,
+    animationEnd: false
+  },
+  old: {
+    name: "old",
+    position: [735, 135],
+    zIndex: 2
+  },
+  btn: {
+    name: "btn",
+    position: [0, 700],
+    buttonMode: true,
+    interactive: true,
+    pace: 1.002,
+    increaseFlag: true,
+    curentRatio: 1,
+    rangeRatio: 1.15,
+    zIndex: 10
+  },
+  final_l2: {
+    name: "final_l2",
+    position: [0, 0],
+    zIndex: 9,
+    alpha: 0,
+    increment: 0.03,
+    edgeAlpha: 0.8
+  },
+  final_l1: {
+    name: "final_l1",
+    position: [0, 0],
+    zIndex: 10,
+    alpha: 0,
+    increment: 0.03
+  }
 };
 var menuCircle = {
   speed: -0.05,

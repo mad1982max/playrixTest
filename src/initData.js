@@ -93,6 +93,90 @@ let animation = {
     btnRangeRatio: 1.15,
 };
 
+const textureObj = {
+    bg: {
+        name: "bg",
+        x: -1100,
+        y: -500,
+        zIndex: 1
+    },
+    austin: {
+        name: "austin",
+        x: 600,
+        y: 170,
+        zIndex: 2
+    },
+    ok: {
+        name: "ok",
+        x: 200,
+        y: 200,
+        alpha: 0,
+        alphaSpeed: 0.04,
+        visible: false,
+        zIndex: 8,
+        buttonMode: true,
+        interactive: true
+    }, 
+    hummer: {
+        name: "hummer",
+        position: [1020,300],
+        alpha: 0,
+        visible: false,
+        alphaPace: 0.03,
+        zIndex: 3,
+        buttonMode: true,
+        interactive: true
+    },
+
+    dec_1: {
+        name: "dec_1",
+        position: [1020,520],
+        zIndex: 3,
+
+    },
+    dec_2: {
+        name: "dec_2",
+        zIndex: 2,
+    },
+    logo: {
+        name: "logo",
+        position: [-400,25],
+        zIndex: 3,
+        animationEnd: false
+    },
+    old: {
+        name: "old",
+        position: [735,135],
+        zIndex: 2
+    },
+    btn: {
+        name: "btn",
+        position: [0, 700],
+        buttonMode: true,
+        interactive: true,
+        pace: 1.002,
+        increaseFlag: true,
+        curentRatio: 1,
+        rangeRatio: 1.15,
+        zIndex: 10,
+    },
+    final_l2: {
+        name: "final_l2",
+        position: [0,0],
+        zIndex: 9,
+        alpha: 0,
+        increment: 0.03,
+        edgeAlpha: 0.8
+    },
+    final_l1: {
+        name: "final_l1",
+        position: [0, 0],
+        zIndex: 10,
+        alpha: 0,
+        increment: 0.03
+    }
+}
+
 let menuCircle = {
     speed: -0.05,
     acceleration: 1.035,
@@ -126,4 +210,4 @@ let menuCircle = {
     rangeAngle: Math.PI/180*60
 };
 
-export {arrImg, initOpt, animation, menuCircle};
+export {arrImg, initOpt, animation, menuCircle, textureObj};
