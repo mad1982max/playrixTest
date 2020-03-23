@@ -47227,7 +47227,8 @@ var GameArea = /*#__PURE__*/function () {
         var d = currentTime - _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].buildAnimTime;
         if (this.newStairs.alpha < 1) this.newStairs.alpha += 0.05;
 
-        if (d >= _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].stairsDuration) {
+        if (this.newStairs.y >= this.newStairs.initY || d >= _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].stairsDuration) {
+          this.newStairs.y = this.newStairs.initY;
           this.newStairs.animationEnd = true;
           return;
         }
