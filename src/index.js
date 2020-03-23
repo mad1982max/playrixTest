@@ -308,11 +308,13 @@ class GameArea {
         if (this.newStairs && this.newStairs.isCreated && !this.newStairs.animationEnd) {
             let currentTime = Date.now();
             let d = currentTime - animation.buildAnimTime;
-            if (this.newStairs.alpha < 1) this.newStairs.alpha +=0.05;            
-            this.newStairs.y = Math.floor(easeInQuart(d, animation.stairsStart, this.newStairs.initY - animation.stairsStart, animation.stairsDuration));
+            if (this.newStairs.alpha < 1) this.newStairs.alpha +=0.05;
             if (d >= animation.stairsDuration) {
                 this.newStairs.animationEnd = true;
-            }
+                return
+            }                        
+            this.newStairs.y = Math.floor(easeInQuart(d, animation.stairsStart, this.newStairs.initY - animation.stairsStart, animation.stairsDuration));
+            
         }
     }
 

@@ -47226,11 +47226,13 @@ var GameArea = /*#__PURE__*/function () {
         var currentTime = Date.now();
         var d = currentTime - _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].buildAnimTime;
         if (this.newStairs.alpha < 1) this.newStairs.alpha += 0.05;
-        this.newStairs.y = Math.floor(Object(_easeFn__WEBPACK_IMPORTED_MODULE_2__["easeInQuart"])(d, _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].stairsStart, this.newStairs.initY - _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].stairsStart, _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].stairsDuration));
 
         if (d >= _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].stairsDuration) {
           this.newStairs.animationEnd = true;
+          return;
         }
+
+        this.newStairs.y = Math.floor(Object(_easeFn__WEBPACK_IMPORTED_MODULE_2__["easeInQuart"])(d, _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].stairsStart, this.newStairs.initY - _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].stairsStart, _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].stairsDuration));
       }
     }
   }, {
