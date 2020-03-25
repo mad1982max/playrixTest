@@ -23,6 +23,7 @@
   "dependencies": {
     "babel-loader": "^8.0.6",
     "pixi-filters": "^3.1.1",
+    "pixi-sound": "^3.0.4",
     "pixi.js": "^5.2.1"
   }
 }

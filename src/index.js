@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js';
 import {arrImg, initOpt, animation, textureObj, SMmenuCircle, XSmenuCircle, XLmenuCircle} from './initData';
 import {easeOutSine, easeInQuart} from './easeFn';
 import {DropShadowFilter} from '@pixi/filter-drop-shadow';
+import pixiSound from 'pixi-sound';
 
 PIXI.utils.sayHello(PIXI.utils.isWebGLSupported() ? "WebGL": "CANVAS");
 
@@ -75,6 +76,10 @@ class GameArea {
 
     loader(loader, resources) {
         this.resources = resources;
+        
+        pixiSound.play('theme', { loop: true })
+        
+        
         let textureToLoadArr = ["bg", "austin", "ok", "hummer", "dec_1", "dec_2", "btn", "logo", "old"];
 
         for (let texture of textureToLoadArr) {
@@ -107,7 +112,6 @@ class GameArea {
 
         this.createMenu(this.resources);            
         this.app.ticker.add(this.ticker.bind(this));
-
     }
 
     resizingCorection() {

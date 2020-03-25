@@ -70,6 +70,10 @@ const arrImg = [
     {
         name: 'final_l2',
         url: './img/final_l2.png'
+    },
+    {
+        name: 'theme', 
+        url: './img/theme.mp3'
     }
 ];
 
