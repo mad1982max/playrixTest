@@ -46904,8 +46904,10 @@ var finalBuildFlag = false;
 var initRatio = _initData__WEBPACK_IMPORTED_MODULE_1__["initOpt"].initWidth / _initData__WEBPACK_IMPORTED_MODULE_1__["initOpt"].initHeight;
 var scaleAdd = 1;
 var isFirstResize = true;
+var isFinish = false;
 var dX = 0;
 var dY = 0;
+var menuCircleInit;
 
 var GameArea = /*#__PURE__*/function () {
   function GameArea() {
@@ -46960,10 +46962,11 @@ var GameArea = /*#__PURE__*/function () {
       parent.addChild(this[name]);
     }
   }, {
-    key: "startGame",
-    value: function startGame() {
+    key: "loader",
+    value: function loader(_loader, resources) {
       var _this = this;
 
+      this.resources = resources;
       var textureToLoadArr = ["bg", "austin", "ok", "hummer", "dec_1", "dec_2", "btn", "logo", "old"];
 
       for (var _i2 = 0, _textureToLoadArr = textureToLoadArr; _i2 < _textureToLoadArr.length; _i2++) {
@@ -46998,20 +47001,53 @@ var GameArea = /*#__PURE__*/function () {
       });
       this.createMenu(this.resources);
       this.app.ticker.add(this.ticker.bind(this));
+      var finalArr = ["final_l2", "final_l1"];
+
+      for (var _i3 = 0, _finalArr = finalArr; _i3 < _finalArr.length; _i3++) {
+        var finalSceneTexture = _finalArr[_i3];
+        this.insertTexture(finalSceneTexture, resources, this.container);
+      }
+
+      this.correctionPositionFinal();
+      isFinish = true;
     }
   }, {
-    key: "loader",
-    value: function loader(_loader, resources) {
-      this.resources = resources;
-      this.startGame(this.resources);
+    key: "resizingCorection",
+    value: function resizingCorection() {
+      var _this2 = this;
+
+      if (!isFinish && !_initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingFlag && !_initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingEnd) {
+        menuContainer.forEach(function (item) {
+          item.destroy();
+          menuContainer = [];
+        });
+        this.createMenu(this.resources);
+      } else if (!isFinish && _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingEnd) {
+        menuContainer.forEach(function (item) {
+          var currentStairs = menuCircleInit.stairs.find(function (val) {
+            return val.nameStair === item.name;
+          });
+          console.log(currentStairs);
+          item.x = currentStairs.menuAfterRotation[0];
+          item.y = currentStairs.menuAfterRotation[1];
+
+          if (item.isChecked) {
+            _this2.ok.x = item.x - 70;
+            _this2.ok.y = item.y + 60;
+            _this2.newStairs.x = currentStairs.alignStairs[0];
+            _this2.newStairs.y = currentStairs.alignStairs[1];
+          }
+        });
+      } else if (isFinish) {
+        this.correctionPositionFinal();
+      }
     }
   }, {
     key: "resize",
     value: function resize() {
-      var _this2 = this;
-
       scaleFactor = Math.min(this.wrapper.offsetWidth / _initData__WEBPACK_IMPORTED_MODULE_1__["initOpt"].initWidth, this.wrapper.offsetHeight / _initData__WEBPACK_IMPORTED_MODULE_1__["initOpt"].initHeight);
       windowRatio = (window.innerWidth / window.innerHeight).toFixed(2);
+      console.log(windowRatio);
       scaleAdd = 1;
       dX = 0;
       dY = 0;
@@ -47020,41 +47056,19 @@ var GameArea = /*#__PURE__*/function () {
         scaleAdd = 2.3;
         dX = -800 * scaleFactor;
         dY = 100 * scaleFactor;
+        menuCircleInit = _initData__WEBPACK_IMPORTED_MODULE_1__["XSmenuCircle"];
+        _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].rangeOfRotation = -Math.PI / 180 * 173;
+        document.body.style.backgroundColor = "yellow";
 
         if (isFirstResize) {
-          _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].logoTrack = 970;
           _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].logo.y = -20;
           _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].old.x = 550;
           _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].hummer.x = 730;
           _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].hummer.y = 380;
           _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].dec_1.x = 820;
           _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].dec_1.y = 560;
-          _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].stairs = [{
-            nameMenu: "menu_ex1",
-            nameStair: "new_1",
-            alignMenu: [-40, -100],
-            alignStairs: [700, 90],
-            initAngle: Math.PI / 180 * 25
-          }, {
-            nameMenu: "menu_ex2",
-            nameStair: "new_2",
-            alignMenu: [-40, -135],
-            alignStairs: [700, 100],
-            initAngle: Math.PI / 180 * 55
-          }, {
-            nameMenu: "menu_ex3",
-            nameStair: "new_3",
-            alignMenu: [-42, -62],
-            alignStairs: [715, 55],
-            initAngle: Math.PI / 180 * 85
-          }];
-          _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerX = 800;
-          _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerY = 680;
-          _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].R = 380;
-          _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].rangeOfRotation = -Math.PI / 180 * 173;
-          document.body.style.backgroundColor = "yellow";
-        } else {
           _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].logoTrack = 970;
+        } else {
           _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].logo.y = -20;
           this.logo.y = -20;
           this.logo.x = 360;
@@ -47064,92 +47078,24 @@ var GameArea = /*#__PURE__*/function () {
           this.btn.y = 700;
           this.dec_1.x = 820;
           this.dec_1.y = 560;
-
-          if (!_initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingFlag && !_initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingEnd) {
-            menuContainer.forEach(function (item) {
-              item.destroy();
-              menuContainer = [];
-            });
-            _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerX = 800;
-            _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerY = 680;
-            _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].R = 380;
-            _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].rangeOfRotation = -Math.PI / 180 * 160;
-            this.createMenu(this.resources);
-          } else if (_initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingEnd) {
-            var smallMenuCoord = [{
-              name: "new_1",
-              x: 478.22,
-              y: 477.87
-            }, {
-              name: "new_2",
-              x: 622.39,
-              y: 344.05
-            }, {
-              name: "new_3",
-              x: 814.15,
-              y: 300.26
-            }];
-            _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].stairs = [{
-              nameMenu: "menu_ex1",
-              nameStair: "new_1",
-              alignMenu: [-40, -100],
-              alignStairs: [700, 90],
-              initAngle: Math.PI / 180 * 25
-            }, {
-              nameMenu: "menu_ex2",
-              nameStair: "new_2",
-              alignMenu: [-40, -135],
-              alignStairs: [700, 100],
-              initAngle: Math.PI / 180 * 55
-            }, {
-              nameMenu: "menu_ex3",
-              nameStair: "new_3",
-              alignMenu: [-42, -62],
-              alignStairs: [715, 55],
-              initAngle: Math.PI / 180 * 85
-            }];
-            menuContainer.forEach(function (item) {
-              var currentStairs = smallMenuCoord.find(function (val) {
-                return val.name === item.name;
-              });
-              item.x = currentStairs.x;
-              item.y = currentStairs.y;
-
-              if (item.isChecked) {
-                _this2.ok.x = item.x - 70;
-                _this2.ok.y = item.y + 60;
-                console.log(item.name);
-                var coordNewStairs = _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].stairs.find(function (newItem) {
-                  console.log(newItem.nameStair, item.name);
-                  return newItem.nameStair === item.name;
-                });
-                console.log('coordNewStairs', coordNewStairs);
-                _this2.newStairs.x = coordNewStairs.alignStairs[0];
-                _this2.newStairs.y = coordNewStairs.alignStairs[1];
-              }
-            });
-          }
-
-          document.body.style.backgroundColor = "yellow";
+          this.resizingCorection();
         }
       } else if (windowRatio >= 0.57 && windowRatio < 1) {
+        console.log('windowRatio >=0.57');
         scaleAdd = 1.45;
         dX = -380 * scaleFactor;
         dY = 30 * scaleFactor;
+        _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].logoTrack = 870;
+        _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].rangeOfRotation = -Math.PI / 180 * 150;
+        document.body.style.backgroundColor = "red";
+        menuCircleInit = _initData__WEBPACK_IMPORTED_MODULE_1__["SMmenuCircle"];
 
         if (isFirstResize) {
-          _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].logoTrack = 870;
           _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].logo.y = 0;
           _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].hummer.x = 920;
           _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].hummer.y = 400;
           _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].btn.y = 670;
-          _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerX = 800;
-          _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerY = 830;
-          _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].R = 400;
-          _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].rangeOfRotation = -Math.PI / 180 * 150;
-          document.body.style.backgroundColor = "red";
         } else {
-          _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].logoTrack = 870;
           this.logo.y = 0;
           this.logo.x = 300;
           this.old.x = 735;
@@ -47159,91 +47105,16 @@ var GameArea = /*#__PURE__*/function () {
           this.btn.y = 670;
           this.dec_1.x = 1020;
           this.dec_1.y = 520;
-
-          if (!_initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingFlag && !_initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingEnd) {
-            menuContainer.forEach(function (item) {
-              item.destroy();
-              menuContainer = [];
-            });
-            _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerX = 800;
-            _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerY = 830;
-            _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].R = 400;
-            this.createMenu(this.resources);
-          } else if (_initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingEnd) {
-            var mediumMenuCoord = [{
-              name: "new_1",
-              x: 612.9,
-              y: 476.45
-            }, {
-              name: "new_2",
-              x: 779.84,
-              y: 430.5
-            }, {
-              name: "new_3",
-              x: 950.56,
-              y: 459.4
-            }];
-            menuContainer.forEach(function (item) {
-              var currentStairs = mediumMenuCoord.find(function (val) {
-                return val.name === item.name;
-              });
-              item.x = currentStairs.x;
-              item.y = currentStairs.y;
-
-              if (item.isChecked) {
-                _this2.ok.x = item.x - 70;
-                _this2.ok.y = item.y + 60;
-              }
-            });
-          }
-
-          document.body.style.backgroundColor = "red";
+          this.resizingCorection();
         }
-      } else if (windowRatio <= 1.43 && windowRatio > 1) {
+      } else if (windowRatio <= 1.43 && windowRatio >= 1) {
         document.body.style.backgroundColor = "orange";
-        console.log('<= 2 >1');
+        menuCircleInit = _initData__WEBPACK_IMPORTED_MODULE_1__["XLmenuCircle"];
 
         if (isFirstResize) {} else {
           this.logo.y = 20;
           this.logo.x = 50;
-
-          if (!_initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingFlag && !_initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingEnd) {
-            menuContainer.forEach(function (item) {
-              item.destroy();
-              menuContainer = [];
-            });
-            _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerX = 1100;
-            _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerY = 550;
-            _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].R = 410;
-            _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].rangeOfRotation = -Math.PI / 180 * 170;
-            this.createMenu(this.resources);
-          } else if (_initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingEnd) {
-            var largeMenuCoord = [{
-              name: "new_1",
-              x: 813.9,
-              y: 256.32
-            }, {
-              name: "new_2",
-              x: 964.82,
-              y: 162.9
-            }, {
-              name: "new_3",
-              x: 1141.06,
-              y: 142.06
-            }];
-            menuContainer.forEach(function (item) {
-              var currentStairs = largeMenuCoord.find(function (val) {
-                return val.name === item.name;
-              });
-              item.x = currentStairs.x;
-              item.y = currentStairs.y;
-
-              if (item.isChecked) {
-                _this2.ok.x = item.x - 70;
-                _this2.ok.y = item.y + 60;
-              }
-            });
-          }
+          this.resizingCorection();
         }
       } else if (windowRatio > 1.43) {
         document.body.style.backgroundColor = "black";
@@ -47259,14 +47130,13 @@ var GameArea = /*#__PURE__*/function () {
       this.container.x = dX;
       this.container.y = dY;
       isFirstResize = false;
-    } //-------------------------------------------------    
-
+    }
   }, {
     key: "createMenu",
     value: function createMenu(resources) {
       var _this3 = this;
 
-      var menuNamesArr = _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].stairs;
+      var menuNamesArr = menuCircleInit.stairs;
 
       for (var i = 0; i < menuNamesArr.length; i++) {
         var _menuNamesArr$i = menuNamesArr[i],
@@ -47274,8 +47144,8 @@ var GameArea = /*#__PURE__*/function () {
             nameStair = _menuNamesArr$i.nameStair,
             nameMenu = _menuNamesArr$i.nameMenu,
             alignMenu = _menuNamesArr$i.alignMenu;
-        var y = _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerY + _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].R * Math.sin(initAngle);
-        var x = _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerX + _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].R * Math.cos(initAngle);
+        var y = menuCircleInit.centerY + menuCircleInit.R * Math.sin(initAngle);
+        var x = menuCircleInit.centerX + menuCircleInit.R * Math.cos(initAngle);
         var containerMenu = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Container"]();
         containerMenu.sortableChildren = true;
         containerMenu.zIndex = 8;
@@ -47285,7 +47155,7 @@ var GameArea = /*#__PURE__*/function () {
         containerMenu.name = nameStair;
         containerMenu.currentRotation = initAngle;
         containerMenu.initAngle = initAngle;
-        containerMenu.speed = _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].speed;
+        containerMenu.speed = menuCircleInit.speed;
         var whiteCircle = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Graphics"]();
         whiteCircle.beginFill(0xffffff);
         whiteCircle.drawCircle(0, 0, 80);
@@ -47349,24 +47219,29 @@ var GameArea = /*#__PURE__*/function () {
       this.showFinal(resources);
     }
   }, {
+    key: "correctionPositionFinal",
+    value: function correctionPositionFinal() {
+      this.final_l2.height = this.wrapper.offsetHeight / scaleFactor;
+      this.final_l2.y = -dY / scaleFactor;
+      var ratioWidthFinal = this.final_l1.width / this.final_l1.height;
+      var widthMulter = windowRatio >= 1 ? 0.6 : 0.9;
+      this.final_l1.width = this.wrapper.offsetWidth / scaleFactor / scaleAdd * widthMulter;
+      this.final_l1.height = this.final_l1.width / ratioWidthFinal;
+      var cY = 0.33 * (this.wrapper.offsetHeight / scaleFactor / scaleAdd - this.final_l1.height) - 3.33 * dY / scaleFactor / scaleAdd;
+      var cX = 0.5 * (this.wrapper.offsetWidth / scaleFactor / scaleAdd - this.final_l1.width - 2 * dX / scaleFactor / scaleAdd);
+      this.final_l1.position.set(cX, cY);
+    }
+  }, {
     key: "showFinal",
     value: function showFinal(resources) {
       var finalArr = ["final_l2", "final_l1"];
 
-      for (var _i3 = 0, _finalArr = finalArr; _i3 < _finalArr.length; _i3++) {
-        var finalSceneTexture = _finalArr[_i3];
+      for (var _i4 = 0, _finalArr2 = finalArr; _i4 < _finalArr2.length; _i4++) {
+        var finalSceneTexture = _finalArr2[_i4];
         this.insertTexture(finalSceneTexture, resources, this.container);
       }
 
-      this.final_l2.height = this.wrapper.offsetHeight / scaleFactor;
-      this.final_l2.y = -dY / scaleFactor;
-      var ratioWidthFinal = this.final_l1.width / this.final_l1.height;
-      this.final_l1.width = this.wrapper.offsetWidth / scaleFactor / scaleAdd * 0.9;
-      this.final_l1.height = this.final_l1.width / ratioWidthFinal; //let cX = 0.5*(this.wrapper.offsetWidth/ scaleFactor - this.final_l1.width);
-
-      var cY = 0.33 * (this.wrapper.offsetHeight / scaleFactor / scaleAdd - this.final_l1.height) - 2 * dY / scaleFactor / scaleAdd;
-      var cX = 0.5 * (this.wrapper.offsetWidth / scaleFactor / scaleAdd - this.final_l1.width - 2 * dX / scaleFactor / scaleAdd);
-      this.final_l1.position.set(cX, cY);
+      this.correctionPositionFinal();
       finalBuildFlag = true;
     }
   }, {
@@ -47375,7 +47250,6 @@ var GameArea = /*#__PURE__*/function () {
       var _this4 = this;
 
       menuContainer.forEach(function (item) {
-        // if(item.isChecked) {               
         var grd = item.children.find(function (val) {
           return val.name === 'grd';
         });
@@ -47389,7 +47263,7 @@ var GameArea = /*#__PURE__*/function () {
 
         grdCircle.zIndex = 8;
         item.isChecked["false"];
-        item.addChild(grdCircle); // }
+        item.addChild(grdCircle);
       });
     }
   }, {
@@ -47428,7 +47302,7 @@ var GameArea = /*#__PURE__*/function () {
       this.ok.alpha = 0;
       this.ok.shadeOut = true;
       this.ok.position.set(currentContainer.x - 70, currentContainer.y + 60);
-      var currentStair = _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].stairs.find(function (item) {
+      var currentStair = menuCircleInit.stairs.find(function (item) {
         return item.nameStair === currentContainer.name;
       });
       this.newStairs = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"](resources[e.target.name].texture);
@@ -47451,10 +47325,10 @@ var GameArea = /*#__PURE__*/function () {
     key: "menuMovingCircle",
     value: function menuMovingCircle(containerArr) {
       for (var i = 0; i < containerArr.length; i++) {
-        containerArr[i].x = _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerX + Math.cos(-containerArr[i].currentRotation) * _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].R;
-        containerArr[i].y = _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerY + Math.sin(containerArr[i].currentRotation) * _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].R;
+        containerArr[i].x = menuCircleInit.centerX + Math.cos(-containerArr[i].currentRotation) * menuCircleInit.R;
+        containerArr[i].y = menuCircleInit.centerY + Math.sin(containerArr[i].currentRotation) * menuCircleInit.R;
         containerArr[i].currentRotation += containerArr[i].speed;
-        containerArr[i].speed *= _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].acceleration;
+        containerArr[i].speed *= menuCircleInit.acceleration;
       }
     }
   }, {
@@ -47563,6 +47437,7 @@ var GameArea = /*#__PURE__*/function () {
       if (finalBuildFlag) {
         if (this.final_l2.alpha >= this.final_l2.edgeAlpha && this.final_l1.alpha >= 1) {
           finalBuildFlag = false;
+          isFinish = true;
           return;
         }
 
@@ -47597,7 +47472,7 @@ var game = new GameArea();
 /*!*************************!*\
   !*** ./src/initData.js ***!
   \*************************/
-/*! exports provided: arrImg, initOpt, animation, menuCircle, textureObj */
+/*! exports provided: arrImg, initOpt, animation, menuCircle, textureObj, SMmenuCircle, XSmenuCircle, XLmenuCircle */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -47607,6 +47482,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "animation", function() { return animation; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "menuCircle", function() { return menuCircle; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "textureObj", function() { return textureObj; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SMmenuCircle", function() { return SMmenuCircle; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "XSmenuCircle", function() { return XSmenuCircle; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "XLmenuCircle", function() { return XLmenuCircle; });
 var arrImg = [{
   name: 'austin',
   url: './img/austin.png'
@@ -47786,6 +47664,99 @@ var menuCircle = {
     nameMenu: "menu_ex3",
     nameStair: "new_3",
     alignMenu: [-42, -62],
+    alignStairs: [850, 55],
+    initAngle: Math.PI / 180 * 80
+  }],
+  rangeAngle: Math.PI / 180 * 60
+};
+var XLmenuCircle = {
+  speed: -0.05,
+  acceleration: 1.035,
+  centerX: 1100,
+  centerY: 550,
+  R: 410,
+  direction: 1,
+  stairs: [{
+    nameMenu: "menu_ex1",
+    nameStair: "new_1",
+    alignMenu: [-40, -100],
+    alignStairs: [835, 90],
+    menuAfterRotation: [813.9, 256.32],
+    initAngle: Math.PI / 180 * 30
+  }, {
+    nameMenu: "menu_ex2",
+    nameStair: "new_2",
+    alignMenu: [-40, -135],
+    menuAfterRotation: [964.82, 162.9],
+    alignStairs: [835, 100],
+    initAngle: Math.PI / 180 * 55
+  }, {
+    nameMenu: "menu_ex3",
+    nameStair: "new_3",
+    alignMenu: [-42, -62],
+    menuAfterRotation: [1141.06, 142.06],
+    alignStairs: [850, 55],
+    initAngle: Math.PI / 180 * 80
+  }],
+  rangeAngle: Math.PI / 180 * 60
+};
+var XSmenuCircle = {
+  speed: -0.05,
+  acceleration: 1.035,
+  centerX: 800,
+  centerY: 680,
+  R: 380,
+  direction: 1,
+  stairs: [{
+    nameMenu: "menu_ex1",
+    nameStair: "new_1",
+    alignMenu: [-40, -100],
+    menuAfterRotation: [478.22, 477.87],
+    alignStairs: [700, 90],
+    initAngle: Math.PI / 180 * 25
+  }, {
+    nameMenu: "menu_ex2",
+    nameStair: "new_2",
+    menuAfterRotation: [622.39, 344.05],
+    alignMenu: [-40, -135],
+    alignStairs: [700, 100],
+    initAngle: Math.PI / 180 * 55
+  }, {
+    nameMenu: "menu_ex3",
+    nameStair: "new_3",
+    menuAfterRotation: [814.15, 300.26],
+    alignMenu: [-42, -62],
+    alignStairs: [715, 55],
+    initAngle: Math.PI / 180 * 85
+  }],
+  rangeAngle: Math.PI / 180 * 60
+};
+var SMmenuCircle = {
+  speed: -0.05,
+  acceleration: 1.035,
+  centerX: 800,
+  centerY: 830,
+  R: 400,
+  direction: 1,
+  stairs: [{
+    nameMenu: "menu_ex1",
+    nameStair: "new_1",
+    alignMenu: [-40, -100],
+    menuAfterRotation: [612.9, 476.45],
+    alignStairs: [835, 90],
+    initAngle: Math.PI / 180 * 30
+  }, {
+    nameMenu: "menu_ex2",
+    nameStair: "new_2",
+    alignMenu: [-40, -135],
+    menuAfterRotation: [779.84, 430.5],
+    alignStairs: [835, 100],
+    initAngle: Math.PI / 180 * 55
+  }, {
+    nameMenu: "menu_ex3",
+    nameStair: "new_3",
+    alignMenu: [-42, -62],
+    menuAfterRotation: [950.56, 459.4],
     alignStairs: [850, 55],
     initAngle: Math.PI / 180 * 80
   }],

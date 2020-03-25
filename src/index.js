@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import {arrImg, initOpt, animation, menuCircle, textureObj} from './initData';
+import {arrImg, initOpt, animation, menuCircle, textureObj, SMmenuCircle, XSmenuCircle, XLmenuCircle} from './initData';
 import {easeOutSine, easeInQuart} from './easeFn';
 
 PIXI.utils.sayHello(PIXI.utils.isWebGLSupported() ? "WebGL": "CANVAS");
@@ -13,8 +13,10 @@ let finalBuildFlag = false;
 let initRatio = initOpt.initWidth/initOpt.initHeight;
 let scaleAdd = 1;
 let isFirstResize = true;
+let isFinish = false;
 let dX = 0;
 let dY = 0;
+let menuCircleInit;
 
 class GameArea {
     constructor() {
@@ -66,7 +68,8 @@ class GameArea {
         
     }
 
-    startGame() {
+    loader(loader, resources) {
+        this.resources = resources;
         let textureToLoadArr = ["bg", "austin", "ok", "hummer", "dec_1", "dec_2", "btn", "logo", "old"];
 
         for (let texture of textureToLoadArr) {
@@ -99,11 +102,46 @@ class GameArea {
 
         this.createMenu(this.resources);            
         this.app.ticker.add(this.ticker.bind(this));
+
+        let finalArr = ["final_l2", "final_l1"];
+
+        for(let finalSceneTexture of finalArr) {
+            this.insertTexture(finalSceneTexture, resources, this.container)
+        }
+
+        this.correctionPositionFinal(); 
+        isFinish = true
     }
 
-    loader(loader, resources) {
-        this.resources = resources;
-        this.startGame(this.resources);
+    resizingCorection() {
+
+        if(!isFinish && !animation.menuMovingFlag && !animation.menuMovingEnd) {
+            menuContainer.forEach(item => {
+                item.destroy(); 
+                menuContainer = [];                       
+            });
+            this.createMenu(this.resources);
+
+        }  else if (!isFinish && animation.menuMovingEnd) {
+
+            menuContainer.forEach(item => {
+                let currentStairs = menuCircleInit.stairs.find(val => val.nameStair === item.name);
+                console.log(currentStairs);
+                
+                
+                item.x = currentStairs.menuAfterRotation[0];
+                item.y = currentStairs.menuAfterRotation[1]
+                if(item.isChecked) {
+
+                    this.ok.x = item.x - 70;
+                    this.ok.y = item.y + 60;
+                    this.newStairs.x = currentStairs.alignStairs[0];
+                    this.newStairs.y = currentStairs.alignStairs[1];
+                }
+            })
+        } else if (isFinish) {
+            this.correctionPositionFinal(); 
+        }
     }
 
     resize() {
@@ -113,6 +151,7 @@ class GameArea {
             this.wrapper.offsetHeight / initOpt.initHeight,
         )
         windowRatio = (window.innerWidth / window.innerHeight).toFixed(2);
+        console.log(windowRatio);        
 
         scaleAdd = 1;
         dX = 0;
@@ -122,50 +161,20 @@ class GameArea {
             scaleAdd = 2.3;
             dX = -800 * scaleFactor;
             dY = 100* scaleFactor;
+            menuCircleInit = XSmenuCircle;
+            animation.rangeOfRotation = -Math.PI/180*173;
+            document.body.style.backgroundColor = "yellow";
 
-            if(isFirstResize) {
-                
-                animation.logoTrack = 970;
-                textureObj.logo.y = -20;
-                
+            if(isFirstResize) {                                
+                textureObj.logo.y = -20;                
                 textureObj.old.x = 550
                 textureObj.hummer.x = 730;
                 textureObj.hummer.y = 380;
                 textureObj.dec_1.x = 820;
                 textureObj.dec_1.y = 560;
-                
-                menuCircle.stairs = [
-                        {
-                            nameMenu: "menu_ex1",
-                            nameStair: "new_1",
-                            alignMenu: [-40,-100],
-                            alignStairs: [700, 90],
-                            initAngle: Math.PI/180*25
-                        },
-                        {
-                            nameMenu: "menu_ex2",
-                            nameStair: "new_2",
-                            alignMenu: [-40,-135],
-                            alignStairs: [700, 100],
-                            initAngle: Math.PI/180*55
-                        },
-                        {
-                            nameMenu: "menu_ex3",
-                            nameStair: "new_3",
-                            alignMenu: [-42,-62],
-                            alignStairs: [715, 55],
-                            initAngle: Math.PI/180*85
-                        }
-                    ];            
-                menuCircle.centerX = 800;
-                menuCircle.centerY = 680;
-                menuCircle.R = 380;
-                animation.rangeOfRotation = -Math.PI/180*173;            
-                document.body.style.backgroundColor = "yellow";
+                animation.logoTrack = 970;
 
             } else {
-
-                animation.logoTrack = 970;
                 textureObj.logo.y = -20;
                 this.logo.y = -20;
                 this.logo.x = 360;
@@ -173,116 +182,31 @@ class GameArea {
                 this.hummer.x = 730;
                 this.hummer.y = 380;
                 this.btn.y = 700;
-
                 this.dec_1.x = 820;
                 this.dec_1.y = 560;
-
-                if(!animation.menuMovingFlag && !animation.menuMovingEnd) {
-                    menuContainer.forEach(item => {
-                        item.destroy(); 
-                        menuContainer = [];                       
-                    });
-                    menuCircle.centerX = 800;
-                    menuCircle.centerY = 680;
-                    menuCircle.R = 380;
-                    animation.rangeOfRotation = -Math.PI/180*160;
-                    this.createMenu(this.resources);
-
-
-                }  else if (animation.menuMovingEnd) {
-                    let smallMenuCoord = [
-                        {
-                            name: "new_1",
-                            x: 478.22,
-                            y: 477.87
-                        },
-                        {
-                            name: "new_2",
-                            x: 622.39,
-                            y: 344.05
-                        },
-                        {
-                            name: "new_3",
-                            x: 814.15,
-                            y: 300.26
-                        },
-        
-                    ]
-                    menuCircle.stairs = [
-                        {
-                            nameMenu: "menu_ex1",
-                            nameStair: "new_1",
-                            alignMenu: [-40,-100],
-                            alignStairs: [700, 90],
-                            initAngle: Math.PI/180*25
-                        },
-                        {
-                            nameMenu: "menu_ex2",
-                            nameStair: "new_2",
-                            alignMenu: [-40,-135],
-                            alignStairs: [700, 100],
-                            initAngle: Math.PI/180*55
-                        },
-                        {
-                            nameMenu: "menu_ex3",
-                            nameStair: "new_3",
-                            alignMenu: [-42,-62],
-                            alignStairs: [715, 55],
-                            initAngle: Math.PI/180*85
-                        }
-                    ]; 
-
-
-                    menuContainer.forEach(item => {
-                        let currentStairs = smallMenuCoord.find(val => val.name === item.name);
-                        item.x = currentStairs.x;
-                        item.y = currentStairs.y;
-                        if(item.isChecked) {
-
-                            this.ok.x = item.x - 70;
-                            this.ok.y = item.y + 60;
-                            console.log(item.name);
-                            
-
-                            let coordNewStairs = menuCircle.stairs.find(newItem => {
-                                console.log(newItem.nameStair, item.name);
-                                return newItem.nameStair === item.name;
-                                
-                                
-                            })
-                            console.log('coordNewStairs', coordNewStairs);
-                            
-                            this.newStairs.x = coordNewStairs.alignStairs[0];
-                            this.newStairs.y = coordNewStairs.alignStairs[1];
-                        }
-                    })
-                }              
-         
-                document.body.style.backgroundColor = "yellow";
+                this.resizingCorection();                  
             }
 
         } else if(windowRatio >= 0.57 && windowRatio < 1) {
+            console.log('windowRatio >=0.57');
+            
             scaleAdd = 1.45;
             dX = -380* scaleFactor;
             dY = 30* scaleFactor;
+            animation.logoTrack = 870;
+            animation.rangeOfRotation = -Math.PI/180*150;
+            document.body.style.backgroundColor = "red";
+            menuCircleInit = SMmenuCircle;
 
             if(isFirstResize) {
 
-                animation.logoTrack = 870;
                 textureObj.logo.y = 0;
-
                 textureObj.hummer.x = 920;
                 textureObj.hummer.y = 400;
-                textureObj.btn.y = 670;    
-                           
-                menuCircle.centerX = 800;
-                menuCircle.centerY = 830;
-                menuCircle.R = 400;
-                animation.rangeOfRotation = -Math.PI/180*150;
-                document.body.style.backgroundColor = "red";
+                textureObj.btn.y = 670;                           
 
             } else {
-                animation.logoTrack = 870;
+
                 this.logo.y = 0;
                 this.logo.x = 300;
                 this.old.x = 735;
@@ -292,102 +216,23 @@ class GameArea {
                 this.btn.y = 670;
                 this.dec_1.x = 1020;
                 this.dec_1.y = 520;
-
-                if(!animation.menuMovingFlag && !animation.menuMovingEnd) {
-                    menuContainer.forEach(item => {
-                        item.destroy(); 
-                        menuContainer = [];                       
-                    });
-                    menuCircle.centerX = 800;
-                    menuCircle.centerY = 830;
-                    menuCircle.R = 400;
-                    this.createMenu(this.resources);
-                } else if(animation.menuMovingEnd) {
-                    let mediumMenuCoord = [
-                        {
-                            name: "new_1",
-                            x: 612.9,
-                            y: 476.45
-                        },
-                        {
-                            name: "new_2",
-                            x: 779.84,
-                            y: 430.5
-                        },
-                        {
-                            name: "new_3",
-                            x: 950.56,
-                            y: 459.4
-                        },
-        
-                    ]
-
-
-                    menuContainer.forEach(item => {
-                        let currentStairs = mediumMenuCoord.find(val => val.name === item.name);
-                        item.x = currentStairs.x;
-                        item.y = currentStairs.y;
-                        if(item.isChecked) {
-                            this.ok.x = item.x - 70;
-                            this.ok.y = item.y + 60
-                        }
-                    })
-                }
-                document.body.style.backgroundColor = "red";
+                this.resizingCorection()  
             }
             
             
 
-        } else if (windowRatio <= 1.43 && windowRatio > 1) {
+        } else if (windowRatio <= 1.43 && windowRatio >= 1) {
             document.body.style.backgroundColor = "orange";
-            console.log('<= 2 >1');
+            menuCircleInit = XLmenuCircle;
+
             if(isFirstResize) {
 
             } else {
                 this.logo.y= 20
                 this.logo.x = 50
-                if(!animation.menuMovingFlag && !animation.menuMovingEnd) {
-                    menuContainer.forEach(item => {
-                        item.destroy(); 
-                        menuContainer = [];                       
-                    });
-                    menuCircle.centerX = 1100;
-                    menuCircle.centerY = 550;
-                    menuCircle.R = 410;
-                    animation.rangeOfRotation = -Math.PI/180*170;
-                    this.createMenu(this.resources);
-                } else if(animation.menuMovingEnd) {
-                    let largeMenuCoord = [
-                        {
-                            name: "new_1",
-                            x: 813.9,
-                            y: 256.32
-                        },
-                        {
-                            name: "new_2",
-                            x: 964.82,
-                            y: 162.9
-                        },
-                        {
-                            name: "new_3",
-                            x: 1141.06,
-                            y: 142.06
-                        },
-        
-                    ]
-
-
-                    menuContainer.forEach(item => {
-                        let currentStairs = largeMenuCoord.find(val => val.name === item.name);
-                        item.x = currentStairs.x;
-                        item.y = currentStairs.y;
-                        if(item.isChecked) {
-                            this.ok.x = item.x - 70;
-                            this.ok.y = item.y + 60
-                        }
-                    })
-                }
+                this.resizingCorection();  
             }
+
         } else if (windowRatio > 1.43) {
             document.body.style.backgroundColor = "black";
             console.log('>= 2');
@@ -406,16 +251,15 @@ class GameArea {
         this.container.scale.set(scaleFactor * scaleAdd); 
         this.container.x = dX;
         this.container.y = dY;
-        isFirstResize = false
+        isFirstResize = false;
     }
-
-//-------------------------------------------------    
+ 
     createMenu(resources) {
-        let menuNamesArr = menuCircle.stairs;
+        let menuNamesArr = menuCircleInit.stairs;
         for (let i = 0; i < menuNamesArr.length; i++) {
             let {initAngle, nameStair, nameMenu, alignMenu} = menuNamesArr[i];
-            let y = menuCircle.centerY + menuCircle.R * Math.sin(initAngle); 
-            let x = menuCircle.centerX + menuCircle.R * Math.cos(initAngle);
+            let y = menuCircleInit.centerY + menuCircleInit.R * Math.sin(initAngle); 
+            let x = menuCircleInit.centerX + menuCircleInit.R * Math.cos(initAngle);
             let containerMenu = new PIXI.Container();
             containerMenu.sortableChildren = true;
             containerMenu.zIndex = 8;
@@ -425,7 +269,7 @@ class GameArea {
             containerMenu.name = nameStair;
             containerMenu.currentRotation = initAngle;
             containerMenu.initAngle = initAngle;
-            containerMenu.speed = menuCircle.speed;
+            containerMenu.speed = menuCircleInit.speed;
 
             let whiteCircle = new PIXI.Graphics();
             whiteCircle.beginFill(0xffffff);
@@ -466,18 +310,18 @@ class GameArea {
     }
 
     createCircleGrad(r, color1, color2) {
-        var canvas = document.createElement('canvas');
+        const canvas = document.createElement('canvas');
         canvas.width  = 200;
         canvas.height = 200;
-        var ctx = canvas.getContext('2d');
-        var grd = ctx.createRadialGradient(r, r, 10, r, r, 60);
+        const ctx = canvas.getContext('2d');
+        const grd = ctx.createRadialGradient(r, r, 10, r, r, 60);
         grd.addColorStop(0, color1);
         grd.addColorStop(1, color2);
         ctx.fillStyle = grd;
         ctx.beginPath();
         ctx.arc(r, r, r, 0, 2 * Math.PI);
         ctx.fill();
-        var sprite = new PIXI.Sprite(PIXI.Texture.from(canvas));
+        const sprite = new PIXI.Sprite(PIXI.Texture.from(canvas));
         sprite.name = "grd";
         sprite.x = -r;
         sprite.y = -r;
@@ -490,46 +334,40 @@ class GameArea {
         this.showFinal(resources);
     }
 
-    showFinal(resources) {
-
-        let finalArr = ["final_l2", "final_l1"];
-
-        for(let finalSceneTexture of finalArr) {
-            this.insertTexture(finalSceneTexture, resources, this.container)
-        }
-
+    correctionPositionFinal() {
         this.final_l2.height = this.wrapper.offsetHeight / scaleFactor;
         this.final_l2.y = -dY/scaleFactor;
 
-        let ratioWidthFinal = this.final_l1.width/this.final_l1.height
+        let ratioWidthFinal = this.final_l1.width/this.final_l1.height;
+        let widthMulter = windowRatio >= 1 ? 0.6 : 0.9;
         
-        this.final_l1.width = this.wrapper.offsetWidth / scaleFactor / scaleAdd *0.9;
+        this.final_l1.width = this.wrapper.offsetWidth / scaleFactor / scaleAdd * widthMulter;
         this.final_l1.height= this.final_l1.width/ratioWidthFinal;
-        
-        //let cX = 0.5*(this.wrapper.offsetWidth/ scaleFactor - this.final_l1.width);
-        let cY = 0.33*(this.wrapper.offsetHeight/ scaleFactor / scaleAdd - this.final_l1.height) -2*dY/ scaleFactor / scaleAdd;
 
+        let cY = 0.33*(this.wrapper.offsetHeight/ scaleFactor / scaleAdd - this.final_l1.height) -3.33*dY/ scaleFactor / scaleAdd;
         let cX= 0.5*(this.wrapper.offsetWidth/ scaleFactor / scaleAdd - this.final_l1.width - 2*dX/scaleFactor/ scaleAdd);
 
         this.final_l1.position.set(cX, cY);
+    }
 
-        
-        
+    showFinal(resources) {
 
-        
+        let finalArr = ["final_l2", "final_l1"];
+        for(let finalSceneTexture of finalArr) {
+            this.insertTexture(finalSceneTexture, resources, this.container)
+        }
+        this.correctionPositionFinal();        
         finalBuildFlag = true;
     }
 
     recolorizeOldMenu() {
         menuContainer.forEach(item => {           
-            // if(item.isChecked) {               
                 let grd = item.children.find(val => val.name === 'grd');
                 grd.destroy({children:true, texture:true, baseTexture:true});
                 let grdCircle = this.createCircleGrad(60, "#FFF6DA", "#F6DBB6");  
                 grdCircle.zIndex = 8;
                 item.isChecked.false;
                 item.addChild(grdCircle); 
-            // }
         })
     }
 
@@ -568,7 +406,7 @@ class GameArea {
         this.ok.shadeOut = true;        
         this.ok.position.set(currentContainer.x - 70, currentContainer.y + 60);
 
-        let currentStair = menuCircle.stairs.find(item => item.nameStair === currentContainer.name);
+        let currentStair = menuCircleInit.stairs.find(item => item.nameStair === currentContainer.name);
 
         this.newStairs = new PIXI.Sprite(resources[e.target.name].texture);
         this.newStairs.isCreated = true;
@@ -589,10 +427,10 @@ class GameArea {
     menuMovingCircle(containerArr) {
         
         for(let i = 0; i < containerArr.length; i++) {
-            containerArr[i].x = menuCircle.centerX + Math.cos(-containerArr[i].currentRotation) * menuCircle.R;
-            containerArr[i].y = menuCircle.centerY + Math.sin(containerArr[i].currentRotation) * menuCircle.R;
+            containerArr[i].x = menuCircleInit.centerX + Math.cos(-containerArr[i].currentRotation) * menuCircleInit.R;
+            containerArr[i].y = menuCircleInit.centerY + Math.sin(containerArr[i].currentRotation) * menuCircleInit.R;
             containerArr[i].currentRotation += containerArr[i].speed;
-            containerArr[i].speed *= menuCircle.acceleration;
+            containerArr[i].speed *= menuCircleInit.acceleration;
         }
     }
 
@@ -690,6 +528,7 @@ class GameArea {
         if (finalBuildFlag) {
             if (this.final_l2.alpha >= this.final_l2.edgeAlpha && this.final_l1.alpha >= 1) {
                 finalBuildFlag = false;
+                isFinish = true;
                 return
             }
             if (this.final_l2.alpha >= 0.8) this.final_l2.increment = 0;

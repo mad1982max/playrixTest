@@ -213,4 +213,112 @@ let menuCircle = {
     rangeAngle: Math.PI/180*60
 };
 
-export {arrImg, initOpt, animation, menuCircle, textureObj};
+let XLmenuCircle = {
+    speed: -0.05,
+    acceleration: 1.035,
+    centerX: 1100,
+    centerY: 550,
+    R: 410,
+    direction: 1,
+    stairs: [
+        {
+            nameMenu: "menu_ex1",
+            nameStair: "new_1",
+            alignMenu: [-40,-100],
+            alignStairs: [835, 90],
+            menuAfterRotation: [813.9, 256.32],
+            initAngle: Math.PI/180*30
+        },
+        {
+            nameMenu: "menu_ex2",
+            nameStair: "new_2",
+            alignMenu: [-40,-135],
+            menuAfterRotation: [964.82, 162.9],
+            alignStairs: [835, 100],
+            initAngle: Math.PI/180*55
+        },
+        {
+            nameMenu: "menu_ex3",
+            nameStair: "new_3",
+            alignMenu: [-42,-62],
+            menuAfterRotation: [1141.06, 142.06],
+            alignStairs: [850, 55],
+            initAngle: Math.PI/180*80
+        }
+    ],
+    rangeAngle: Math.PI/180*60
+};
+
+let XSmenuCircle = {
+    speed: -0.05,
+    acceleration: 1.035,
+    centerX: 800,
+    centerY: 680,
+    R: 380,
+    direction: 1,
+    stairs: [
+        {
+            nameMenu: "menu_ex1",
+            nameStair: "new_1",
+            alignMenu: [-40,-100],
+            menuAfterRotation: [478.22, 477.87],
+            alignStairs: [700, 90],
+            initAngle: Math.PI/180*25
+        },
+        {
+            nameMenu: "menu_ex2",
+            nameStair: "new_2",
+            menuAfterRotation: [622.39, 344.05],
+            alignMenu: [-40,-135],
+            alignStairs: [700, 100],
+            initAngle: Math.PI/180*55
+        },
+        {
+            nameMenu: "menu_ex3",
+            nameStair: "new_3",
+            menuAfterRotation: [814.15, 300.26],
+            alignMenu: [-42,-62],
+            alignStairs: [715, 55],
+            initAngle: Math.PI/180*85
+        }
+    ],
+    rangeAngle: Math.PI/180*60
+};
+
+let SMmenuCircle = {
+    speed: -0.05,
+    acceleration: 1.035,
+    centerX: 800,
+    centerY: 830,
+    R: 400,
+    direction: 1,
+    stairs: [
+        {
+            nameMenu: "menu_ex1",
+            nameStair: "new_1",
+            alignMenu: [-40,-100],
+            menuAfterRotation: [612.9, 476.45],
+            alignStairs: [835, 90],
+            initAngle: Math.PI/180*30
+        },
+        {
+            nameMenu: "menu_ex2",
+            nameStair: "new_2",
+            alignMenu: [-40,-135],
+            menuAfterRotation: [779.84, 430.5],
+            alignStairs: [835, 100],
+            initAngle: Math.PI/180*55
+        },
+        {
+            nameMenu: "menu_ex3",
+            nameStair: "new_3",
+            alignMenu: [-42,-62],
+            menuAfterRotation: [950.56, 459.4],
+            alignStairs: [850, 55],
+            initAngle: Math.PI/180*80
+        }
+    ],
+    rangeAngle: Math.PI/180*60
+};
+
+export {arrImg, initOpt, animation, menuCircle, textureObj, SMmenuCircle, XSmenuCircle, XLmenuCircle};
