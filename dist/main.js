@@ -48052,61 +48052,61 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "XLmenuCircle", function() { return XLmenuCircle; });
 var arrImg = [{
   name: 'austin',
-  url: './img/austin.png'
+  url: './dist/img/austin.png'
 }, {
   name: 'bg',
-  url: './img/back.png'
+  url: './dist/img/back.png'
 }, {
   name: 'dec_1',
-  url: './img/dec_1.png'
+  url: './dist/img/dec_1.png'
 }, {
   name: 'dec_2',
-  url: './img/dec_2.png'
+  url: './dist/img/dec_2.png'
 }, {
   name: 'old',
-  url: './img/old.png'
+  url: './dist/img/old.png'
 }, {
   name: 'logo',
-  url: './img/logo.png'
+  url: './dist/img/logo.png'
 }, {
   name: 'hummer',
-  url: './img/hummer.png'
+  url: './dist/img/hummer.png'
 }, {
   name: 'btn',
-  url: './img/btn.png'
+  url: './dist/img/btn.png'
 }, {
   name: 'menu_ex1',
-  url: './img/menu_ex1.png'
+  url: './dist/img/menu_ex1.png'
 }, {
   name: 'menu_ex2',
-  url: './img/menu_ex2.png'
+  url: './dist/img/menu_ex2.png'
 }, {
   name: 'menu_ex3',
-  url: './img/menu_ex3.png'
+  url: './dist/img/menu_ex3.png'
 }, {
   name: 'circle',
-  url: './img/circle.png'
+  url: './dist/img/circle.png'
 }, {
   name: 'ok',
-  url: './img/ok.png'
+  url: './dist/img/ok.png'
 }, {
   name: 'new_1',
-  url: './img/new_1.png'
+  url: './dist/img/new_1.png'
 }, {
   name: 'new_2',
-  url: './img/new_2.png'
+  url: './dist/img/new_2.png'
 }, {
   name: 'new_3',
-  url: './img/new_3.png'
+  url: './dist/img/new_3.png'
 }, {
   name: 'final_l1',
-  url: './img/final_l1.png'
+  url: './dist/img/final_l1.png'
 }, {
   name: 'final_l2',
-  url: './img/final_l2.png'
+  url: './dist/img/final_l2.png'
 }, {
   name: 'theme',
-  url: './img/theme.mp3'
+  url: './dist/img/theme.mp3'
 }];
 var initOpt = {
   initWidth: 1240,
