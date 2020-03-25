@@ -46908,6 +46908,7 @@ var isFinish = false;
 var dX = 0;
 var dY = 0;
 var menuCircleInit;
+var filter = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["filters"].AlphaFilter(0);
 
 var GameArea = /*#__PURE__*/function () {
   function GameArea() {
@@ -46978,13 +46979,13 @@ var GameArea = /*#__PURE__*/function () {
       this.btn.x = centerX;
       _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].logoAnimTime = Date.now();
       this.btn.on('tap', function () {
-        return console.log('continue');
+        return console.log('...download');
       });
       this.btn.on('click', function () {
-        return console.log('continue');
+        return console.log('...download');
       });
       this.ok.on('click', function (e) {
-        _this.changeStairs(e, resources);
+        _this.changeStairs(e, _this.resources);
       });
       this.ok.on('tap', function (e) {
         _this.changeStairs(e, _this.resources);
@@ -47001,15 +47002,6 @@ var GameArea = /*#__PURE__*/function () {
       });
       this.createMenu(this.resources);
       this.app.ticker.add(this.ticker.bind(this));
-      var finalArr = ["final_l2", "final_l1"];
-
-      for (var _i3 = 0, _finalArr = finalArr; _i3 < _finalArr.length; _i3++) {
-        var finalSceneTexture = _finalArr[_i3];
-        this.insertTexture(finalSceneTexture, resources, this.container);
-      }
-
-      this.correctionPositionFinal();
-      isFinish = true;
     }
   }, {
     key: "resizingCorection",
@@ -47027,7 +47019,6 @@ var GameArea = /*#__PURE__*/function () {
           var currentStairs = menuCircleInit.stairs.find(function (val) {
             return val.nameStair === item.name;
           });
-          console.log(currentStairs);
           item.x = currentStairs.menuAfterRotation[0];
           item.y = currentStairs.menuAfterRotation[1];
 
@@ -47045,9 +47036,12 @@ var GameArea = /*#__PURE__*/function () {
   }, {
     key: "resize",
     value: function resize() {
+      var _this3 = this;
+
+      this.container.filters = [filter];
+      console.log("windowRatio: ", windowRatio);
       scaleFactor = Math.min(this.wrapper.offsetWidth / _initData__WEBPACK_IMPORTED_MODULE_1__["initOpt"].initWidth, this.wrapper.offsetHeight / _initData__WEBPACK_IMPORTED_MODULE_1__["initOpt"].initHeight);
       windowRatio = (window.innerWidth / window.innerHeight).toFixed(2);
-      console.log(windowRatio);
       scaleAdd = 1;
       dX = 0;
       dY = 0;
@@ -47058,7 +47052,6 @@ var GameArea = /*#__PURE__*/function () {
         dY = 100 * scaleFactor;
         menuCircleInit = _initData__WEBPACK_IMPORTED_MODULE_1__["XSmenuCircle"];
         _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].rangeOfRotation = -Math.PI / 180 * 173;
-        document.body.style.backgroundColor = "yellow";
 
         if (isFirstResize) {
           _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].logo.y = -20;
@@ -47080,14 +47073,15 @@ var GameArea = /*#__PURE__*/function () {
           this.dec_1.y = 560;
           this.resizingCorection();
         }
+
+        this.wrapper.style.width = "100%";
+        this.wrapper.style.height = "".concat(scaleAdd * this.wrapper.offsetWidth / initRatio + dY, "px");
       } else if (windowRatio >= 0.57 && windowRatio < 1) {
-        console.log('windowRatio >=0.57');
         scaleAdd = 1.45;
         dX = -380 * scaleFactor;
         dY = 30 * scaleFactor;
         _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].logoTrack = 870;
         _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].rangeOfRotation = -Math.PI / 180 * 150;
-        document.body.style.backgroundColor = "red";
         menuCircleInit = _initData__WEBPACK_IMPORTED_MODULE_1__["SMmenuCircle"];
 
         if (isFirstResize) {
@@ -47107,22 +47101,27 @@ var GameArea = /*#__PURE__*/function () {
           this.dec_1.y = 520;
           this.resizingCorection();
         }
-      } else if (windowRatio <= 1.43 && windowRatio >= 1) {
-        document.body.style.backgroundColor = "orange";
-        menuCircleInit = _initData__WEBPACK_IMPORTED_MODULE_1__["XLmenuCircle"];
 
-        if (isFirstResize) {} else {
+        this.wrapper.style.width = "100%";
+        this.wrapper.style.height = "".concat(scaleAdd * this.wrapper.offsetWidth / initRatio + dY, "px");
+      } else if (windowRatio <= 1.43 && windowRatio >= 1) {
+        menuCircleInit = _initData__WEBPACK_IMPORTED_MODULE_1__["XLmenuCircle"];
+        this.wrapper.style.height = "".concat(scaleAdd * this.wrapper.offsetWidth / initRatio + dY, "px");
+
+        if (!isFirstResize) {
           this.logo.y = 20;
           this.logo.x = 50;
           this.resizingCorection();
         }
+
+        this.wrapper.style.width = "100%";
+        this.wrapper.style.height = "".concat(scaleAdd * this.wrapper.offsetWidth / initRatio + dY, "px");
       } else if (windowRatio > 1.43) {
-        document.body.style.backgroundColor = "black";
-        console.log('>= 2');
+        menuCircleInit = _initData__WEBPACK_IMPORTED_MODULE_1__["XLmenuCircle"];
+        this.wrapper.style.height = "100vh";
         this.wrapper.style.width = "".concat(scaleAdd * this.wrapper.offsetHeight * initRatio + dX, "px");
       }
 
-      this.wrapper.style.height = "".concat(scaleAdd * this.wrapper.offsetWidth / initRatio + dY, "px");
       var newWidth = Math.ceil(_initData__WEBPACK_IMPORTED_MODULE_1__["initOpt"].initWidth * scaleFactor);
       var newHeight = Math.ceil(_initData__WEBPACK_IMPORTED_MODULE_1__["initOpt"].initHeight * scaleFactor);
       this.app.resize(newWidth, newHeight);
@@ -47130,11 +47129,14 @@ var GameArea = /*#__PURE__*/function () {
       this.container.x = dX;
       this.container.y = dY;
       isFirstResize = false;
+      setTimeout(function () {
+        return _this3.container.filters = [];
+      }, 2000);
     }
   }, {
     key: "createMenu",
     value: function createMenu(resources) {
-      var _this3 = this;
+      var _this4 = this;
 
       var menuNamesArr = menuCircleInit.stairs;
 
@@ -47177,10 +47179,10 @@ var GameArea = /*#__PURE__*/function () {
         containerMenu.mask = mask;
         containerMenu.buttonMode = true;
         containerMenu.on('click', function (e) {
-          return _this3.clickOnMenu.call(_this3, e, resources);
+          return _this4.clickOnMenu.call(_this4, e, resources);
         });
         containerMenu.on('tap', function (e) {
-          return _this3.clickOnMenu.call(_this3, e, resources);
+          return _this4.clickOnMenu.call(_this4, e, resources);
         });
         this.container.addChild(containerMenu);
         var menu_ex = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"](resources[nameMenu].texture);
@@ -47225,9 +47227,10 @@ var GameArea = /*#__PURE__*/function () {
       this.final_l2.y = -dY / scaleFactor;
       var ratioWidthFinal = this.final_l1.width / this.final_l1.height;
       var widthMulter = windowRatio >= 1 ? 0.6 : 0.9;
+      var verticalMulter = windowRatio <= 0.57 ? 0.5 : 0.35;
       this.final_l1.width = this.wrapper.offsetWidth / scaleFactor / scaleAdd * widthMulter;
       this.final_l1.height = this.final_l1.width / ratioWidthFinal;
-      var cY = 0.33 * (this.wrapper.offsetHeight / scaleFactor / scaleAdd - this.final_l1.height) - 3.33 * dY / scaleFactor / scaleAdd;
+      var cY = verticalMulter * (this.wrapper.offsetHeight / scaleFactor / scaleAdd - this.final_l1.height) - dY / scaleFactor / scaleAdd / verticalMulter;
       var cX = 0.5 * (this.wrapper.offsetWidth / scaleFactor / scaleAdd - this.final_l1.width - 2 * dX / scaleFactor / scaleAdd);
       this.final_l1.position.set(cX, cY);
     }
@@ -47236,8 +47239,8 @@ var GameArea = /*#__PURE__*/function () {
     value: function showFinal(resources) {
       var finalArr = ["final_l2", "final_l1"];
 
-      for (var _i4 = 0, _finalArr2 = finalArr; _i4 < _finalArr2.length; _i4++) {
-        var finalSceneTexture = _finalArr2[_i4];
+      for (var _i3 = 0, _finalArr = finalArr; _i3 < _finalArr.length; _i3++) {
+        var finalSceneTexture = _finalArr[_i3];
         this.insertTexture(finalSceneTexture, resources, this.container);
       }
 
@@ -47247,7 +47250,7 @@ var GameArea = /*#__PURE__*/function () {
   }, {
     key: "recolorizeOldMenu",
     value: function recolorizeOldMenu() {
-      var _this4 = this;
+      var _this5 = this;
 
       menuContainer.forEach(function (item) {
         var grd = item.children.find(function (val) {
@@ -47259,7 +47262,7 @@ var GameArea = /*#__PURE__*/function () {
           baseTexture: true
         });
 
-        var grdCircle = _this4.createCircleGrad(60, "#FFF6DA", "#F6DBB6");
+        var grdCircle = _this5.createCircleGrad(60, "#FFF6DA", "#F6DBB6");
 
         grdCircle.zIndex = 8;
         item.isChecked["false"];
@@ -47386,9 +47389,6 @@ var GameArea = /*#__PURE__*/function () {
         if (currentRotation - initAngle <= _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].rangeOfRotation) {
           _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingFlag = false;
           _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingEnd = true;
-          menuContainer.forEach(function (item) {
-            return console.log(item.x, item.y, item.name);
-          });
         }
       }
     }
@@ -47627,8 +47627,7 @@ var textureObj = {
     name: "final_l2",
     position: [0, 0],
     zIndex: 9,
-    //alpha: 0,
-    alpha: 1,
+    alpha: 0,
     increment: 0.03,
     edgeAlpha: 0.8
   },
@@ -47636,8 +47635,7 @@ var textureObj = {
     name: "final_l1",
     position: [0, 0],
     zIndex: 10,
-    //alpha: 0,
-    alpha: 1,
+    alpha: 0,
     increment: 0.03
   }
 };

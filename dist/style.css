@@ -9,14 +9,10 @@ html {
 }
 
 body {
-    background-color: yellow;
-    /* max-width: 1240px; */
-
-    
+    background-color: black;   
 }
 
 #wrapper {
-    /* max-width: 1240px; */
     margin: auto;
     height: 100vh;
 }

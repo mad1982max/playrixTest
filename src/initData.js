@@ -165,8 +165,7 @@ const textureObj = {
         name: "final_l2",
         position: [0,0],
         zIndex: 9,
-        //alpha: 0,
-        alpha:1,
+        alpha: 0,
         increment: 0.03,
         edgeAlpha: 0.8
     },
@@ -174,8 +173,7 @@ const textureObj = {
         name: "final_l1",
         position: [0, 0],
         zIndex: 10,
-        //alpha: 0,
-        alpha:1,
+        alpha: 0,
         increment: 0.03
     }
 }
