@@ -80,7 +80,7 @@ let initOpt = {
 
 let animation = {
     logoAnimTime: null,
-    logoDuration: 1000,
+    logoDuration: 1300,
     logoStart: -600,
     logoTrack: 650,
     stairsStart: -100,
@@ -112,7 +112,7 @@ const textureObj = {
         alpha: 0,
         alphaSpeed: 0.04,
         visible: false,
-        zIndex: 8,
+        zIndex: 9,
         buttonMode: true,
         interactive: true
     }, 
@@ -178,46 +178,12 @@ const textureObj = {
     }
 }
 
-let menuCircle = {
-    speed: -0.05,
-    acceleration: 1.035,
-    centerX: 1100,
-    centerY: 550,
-    R: 410,
-    direction: 1,
-    stairs: [
-        {
-            nameMenu: "menu_ex1",
-            nameStair: "new_1",
-            alignMenu: [-40,-100],
-            alignStairs: [835, 90],
-            initAngle: Math.PI/180*30
-        },
-        {
-            nameMenu: "menu_ex2",
-            nameStair: "new_2",
-            alignMenu: [-40,-135],
-            alignStairs: [835, 100],
-            initAngle: Math.PI/180*55
-        },
-        {
-            nameMenu: "menu_ex3",
-            nameStair: "new_3",
-            alignMenu: [-42,-62],
-            alignStairs: [850, 55],
-            initAngle: Math.PI/180*80
-        }
-    ],
-    rangeAngle: Math.PI/180*60
-};
-
 let XLmenuCircle = {
     speed: -0.05,
     acceleration: 1.035,
     centerX: 1100,
     centerY: 550,
     R: 410,
-    direction: 1,
     stairs: [
         {
             nameMenu: "menu_ex1",
@@ -243,8 +209,7 @@ let XLmenuCircle = {
             alignStairs: [850, 55],
             initAngle: Math.PI/180*80
         }
-    ],
-    rangeAngle: Math.PI/180*60
+    ]
 };
 
 let XSmenuCircle = {
@@ -253,7 +218,6 @@ let XSmenuCircle = {
     centerX: 800,
     centerY: 680,
     R: 380,
-    direction: 1,
     stairs: [
         {
             nameMenu: "menu_ex1",
@@ -279,8 +243,7 @@ let XSmenuCircle = {
             alignStairs: [715, 55],
             initAngle: Math.PI/180*85
         }
-    ],
-    rangeAngle: Math.PI/180*60
+    ]
 };
 
 let SMmenuCircle = {
@@ -289,7 +252,6 @@ let SMmenuCircle = {
     centerX: 800,
     centerY: 830,
     R: 400,
-    direction: 1,
     stairs: [
         {
             nameMenu: "menu_ex1",
@@ -315,8 +277,7 @@ let SMmenuCircle = {
             alignStairs: [850, 55],
             initAngle: Math.PI/180*80
         }
-    ],
-    rangeAngle: Math.PI/180*60
+    ]
 };
 
-export {arrImg, initOpt, animation, menuCircle, textureObj, SMmenuCircle, XSmenuCircle, XLmenuCircle};
+export {arrImg, initOpt, animation, textureObj, SMmenuCircle, XSmenuCircle, XLmenuCircle};

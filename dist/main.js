@@ -18094,6 +18094,298 @@ var DisplacementFilter = /*@__PURE__*/(function (Filter) {
 
 /***/ }),
 
+/***/ "./node_modules/@pixi/filter-drop-shadow/lib/filter-drop-shadow.esm.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/@pixi/filter-drop-shadow/lib/filter-drop-shadow.esm.js ***!
+  \*****************************************************************************/
+/*! exports provided: DropShadowFilter */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DropShadowFilter", function() { return DropShadowFilter; });
+/* harmony import */ var _pixi_filter_kawase_blur__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @pixi/filter-kawase-blur */ "./node_modules/@pixi/filter-kawase-blur/lib/filter-kawase-blur.esm.js");
+/* harmony import */ var _pixi_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @pixi/core */ "./node_modules/@pixi/core/lib/core.es.js");
+/* harmony import */ var _pixi_settings__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @pixi/settings */ "./node_modules/@pixi/settings/lib/settings.es.js");
+/* harmony import */ var _pixi_math__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @pixi/math */ "./node_modules/@pixi/math/lib/math.es.js");
+/* harmony import */ var _pixi_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @pixi/utils */ "./node_modules/@pixi/utils/lib/utils.es.js");
+/*!
+ * @pixi/filter-drop-shadow - v3.1.0
+ * Compiled Wed, 11 Mar 2020 20:38:18 UTC
+ *
+ * @pixi/filter-drop-shadow is licensed under the MIT License.
+ * http://www.opensource.org/licenses/mit-license
+ */
+
+
+
+
+
+
+var vertex = "attribute vec2 aVertexPosition;\nattribute vec2 aTextureCoord;\n\nuniform mat3 projectionMatrix;\n\nvarying vec2 vTextureCoord;\n\nvoid main(void)\n{\n    gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);\n    vTextureCoord = aTextureCoord;\n}";
+
+var fragment = "varying vec2 vTextureCoord;\nuniform sampler2D uSampler;\nuniform float alpha;\nuniform vec3 color;\n\nuniform vec2 shift;\nuniform vec4 inputSize;\n\nvoid main(void){\n    vec4 sample = texture2D(uSampler, vTextureCoord - shift * inputSize.zw);\n\n    // Premultiply alpha\n    sample.rgb = color.rgb * sample.a;\n\n    // alpha user alpha\n    sample *= alpha;\n\n    gl_FragColor = sample;\n}";
+
+/**
+ * Drop shadow filter.<br>
+ * ![original](../tools/screenshots/dist/original.png)![filter](../tools/screenshots/dist/drop-shadow.png)
+ * @class
+ * @extends PIXI.Filter
+ * @memberof PIXI.filters
+ * @see {@link https://www.npmjs.com/package/@pixi/filter-drop-shadow|@pixi/filter-drop-shadow}
+ * @see {@link https://www.npmjs.com/package/pixi-filters|pixi-filters}
+ * @param {object} [options] Filter options
+ * @param {number} [options.rotation=45] The angle of the shadow in degrees.
+ * @param {number} [options.distance=5] Distance of shadow
+ * @param {number} [options.color=0x000000] Color of the shadow
+ * @param {number} [options.alpha=0.5] Alpha of the shadow
+ * @param {number} [options.shadowOnly=false] Whether render shadow only
+ * @param {number} [options.blur=2] - Sets the strength of the Blur properties simultaneously
+ * @param {number} [options.quality=3] - The quality of the Blur filter.
+ * @param {number[]} [options.kernels=null] - The kernels of the Blur filter.
+ * @param {number|number[]|PIXI.Point} [options.pixelSize=1] - the pixelSize of the Blur filter.
+ * @param {number} [options.resolution=PIXI.settings.RESOLUTION] - The resolution of the Blur filter.
+ */
+var DropShadowFilter = /*@__PURE__*/(function (Filter) {
+    function DropShadowFilter(options) {
+
+        // Fallback support for ctor: (rotation, distance, blur, color, alpha)
+        if (options && options.constructor !== Object) {
+            // eslint-disable-next-line no-console
+            console.warn('DropShadowFilter now uses options instead of (rotation, distance, blur, color, alpha)');
+            options = { rotation: options };
+            if (arguments[1] !== undefined) {
+                options.distance = arguments[1];
+            }
+            if (arguments[2] !== undefined) {
+                options.blur = arguments[2];
+            }
+            if (arguments[3] !== undefined) {
+                options.color = arguments[3];
+            }
+            if (arguments[4] !== undefined) {
+                options.alpha = arguments[4];
+            }
+        }
+
+        options = Object.assign({
+            rotation: 45,
+            distance: 5,
+            color: 0x000000,
+            alpha: 0.5,
+            shadowOnly: false,
+            kernels: null,
+            blur: 2,
+            quality: 3,
+            pixelSize: 1,
+            resolution: _pixi_settings__WEBPACK_IMPORTED_MODULE_2__["settings"].RESOLUTION,
+        }, options);
+
+        Filter.call(this);
+
+        var kernels = options.kernels;
+        var blur = options.blur;
+        var quality = options.quality;
+        var pixelSize = options.pixelSize;
+        var resolution = options.resolution;
+
+        this._tintFilter = new Filter(vertex, fragment);
+        this._tintFilter.uniforms.color = new Float32Array(4);
+        this._tintFilter.uniforms.shift = new _pixi_math__WEBPACK_IMPORTED_MODULE_3__["Point"]();
+        this._tintFilter.resolution = resolution;
+        this._blurFilter = kernels ?
+            new _pixi_filter_kawase_blur__WEBPACK_IMPORTED_MODULE_0__["KawaseBlurFilter"](kernels) :
+            new _pixi_filter_kawase_blur__WEBPACK_IMPORTED_MODULE_0__["KawaseBlurFilter"](blur, quality);
+
+        this.pixelSize = pixelSize;
+        this.resolution = resolution;
+
+        var shadowOnly = options.shadowOnly;
+        var rotation = options.rotation;
+        var distance = options.distance;
+        var alpha = options.alpha;
+        var color = options.color;
+
+        this.shadowOnly = shadowOnly;
+        this.rotation = rotation;
+        this.distance = distance;
+        this.alpha = alpha;
+        this.color = color;
+
+        this._updatePadding();
+    }
+
+    if ( Filter ) DropShadowFilter.__proto__ = Filter;
+    DropShadowFilter.prototype = Object.create( Filter && Filter.prototype );
+    DropShadowFilter.prototype.constructor = DropShadowFilter;
+
+    var prototypeAccessors = { resolution: { configurable: true },distance: { configurable: true },rotation: { configurable: true },alpha: { configurable: true },color: { configurable: true },kernels: { configurable: true },blur: { configurable: true },quality: { configurable: true },pixelSize: { configurable: true } };
+
+    DropShadowFilter.prototype.apply = function apply (filterManager, input, output, clear) {
+        var target = filterManager.getFilterTexture();
+
+        this._tintFilter.apply(filterManager, input, target, 1);
+        this._blurFilter.apply(filterManager, target, output, clear);
+
+        if (this.shadowOnly !== true) {
+            filterManager.applyFilter(this, input, output, 0);
+        }
+
+        filterManager.returnFilterTexture(target);
+    };
+
+    /**
+     * Recalculate the proper padding amount.
+     * @private
+     */
+    DropShadowFilter.prototype._updatePadding = function _updatePadding () {
+        this.padding = this.distance + (this.blur * 2);
+    };
+
+    /**
+     * Update the transform matrix of offset angle.
+     * @private
+     */
+    DropShadowFilter.prototype._updateShift = function _updateShift () {
+        this._tintFilter.uniforms.shift.set(
+            this.distance * Math.cos(this.angle),
+            this.distance * Math.sin(this.angle)
+        );
+    };
+
+    /**
+     * The resolution of the filter.
+     *
+     * @member {number}
+     * @default PIXI.settings.RESOLUTION
+     */
+    prototypeAccessors.resolution.get = function () {
+        return this._resolution;
+    };
+    prototypeAccessors.resolution.set = function (value) {
+        this._resolution = value;
+
+        if (this._tintFilter) {
+            this._tintFilter.resolution = value;
+        }
+        if (this._blurFilter) {
+            this._blurFilter.resolution = value;
+        }
+    };
+
+    /**
+     * Distance offset of the shadow
+     * @member {number}
+     * @default 5
+     */
+    prototypeAccessors.distance.get = function () {
+        return this._distance;
+    };
+    prototypeAccessors.distance.set = function (value) {
+        this._distance = value;
+        this._updatePadding();
+        this._updateShift();
+    };
+
+    /**
+     * The angle of the shadow in degrees
+     * @member {number}
+     * @default 2
+     */
+    prototypeAccessors.rotation.get = function () {
+        return this.angle / _pixi_math__WEBPACK_IMPORTED_MODULE_3__["DEG_TO_RAD"];
+    };
+    prototypeAccessors.rotation.set = function (value) {
+        this.angle = value * _pixi_math__WEBPACK_IMPORTED_MODULE_3__["DEG_TO_RAD"];
+        this._updateShift();
+    };
+
+    /**
+     * The alpha of the shadow
+     * @member {number}
+     * @default 1
+     */
+    prototypeAccessors.alpha.get = function () {
+        return this._tintFilter.uniforms.alpha;
+    };
+    prototypeAccessors.alpha.set = function (value) {
+        this._tintFilter.uniforms.alpha = value;
+    };
+
+    /**
+     * The color of the shadow.
+     * @member {number}
+     * @default 0x000000
+     */
+    prototypeAccessors.color.get = function () {
+        return Object(_pixi_utils__WEBPACK_IMPORTED_MODULE_4__["rgb2hex"])(this._tintFilter.uniforms.color);
+    };
+    prototypeAccessors.color.set = function (value) {
+        Object(_pixi_utils__WEBPACK_IMPORTED_MODULE_4__["hex2rgb"])(value, this._tintFilter.uniforms.color);
+    };
+
+    /**
+     * Sets the kernels of the Blur Filter
+     *
+     * @member {number[]}
+     */
+    prototypeAccessors.kernels.get = function () {
+        return this._blurFilter.kernels;
+    };
+    prototypeAccessors.kernels.set = function (value) {
+        this._blurFilter.kernels = value;
+    };
+
+    /**
+     * The blur of the shadow
+     * @member {number}
+     * @default 2
+     */
+    prototypeAccessors.blur.get = function () {
+        return this._blurFilter.blur;
+    };
+    prototypeAccessors.blur.set = function (value) {
+        this._blurFilter.blur = value;
+        this._updatePadding();
+    };
+
+    /**
+     * Sets the quality of the Blur Filter
+     *
+     * @member {number}
+     * @default 4
+     */
+    prototypeAccessors.quality.get = function () {
+        return this._blurFilter.quality;
+    };
+    prototypeAccessors.quality.set = function (value) {
+        this._blurFilter.quality = value;
+    };
+
+    /**
+     * Sets the pixelSize of the Kawase Blur filter
+     *
+     * @member {number|number[]|PIXI.Point}
+     * @default 1
+     */
+    prototypeAccessors.pixelSize.get = function () {
+        return this._blurFilter.pixelSize;
+    };
+    prototypeAccessors.pixelSize.set = function (value) {
+        this._blurFilter.pixelSize = value;
+    };
+
+    Object.defineProperties( DropShadowFilter.prototype, prototypeAccessors );
+
+    return DropShadowFilter;
+}(_pixi_core__WEBPACK_IMPORTED_MODULE_1__["Filter"]));
+
+
+//# sourceMappingURL=filter-drop-shadow.esm.js.map
+
+
+/***/ }),
+
 /***/ "./node_modules/@pixi/filter-fxaa/lib/filter-fxaa.es.js":
 /*!**************************************************************!*\
   !*** ./node_modules/@pixi/filter-fxaa/lib/filter-fxaa.es.js ***!
@@ -18145,6 +18437,246 @@ var FXAAFilter = /*@__PURE__*/(function (Filter) {
 
 
 //# sourceMappingURL=filter-fxaa.es.js.map
+
+
+/***/ }),
+
+/***/ "./node_modules/@pixi/filter-kawase-blur/lib/filter-kawase-blur.esm.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/@pixi/filter-kawase-blur/lib/filter-kawase-blur.esm.js ***!
+  \*****************************************************************************/
+/*! exports provided: KawaseBlurFilter */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KawaseBlurFilter", function() { return KawaseBlurFilter; });
+/* harmony import */ var _pixi_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @pixi/core */ "./node_modules/@pixi/core/lib/core.es.js");
+/* harmony import */ var _pixi_math__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @pixi/math */ "./node_modules/@pixi/math/lib/math.es.js");
+/*!
+ * @pixi/filter-kawase-blur - v3.1.0
+ * Compiled Wed, 11 Mar 2020 20:38:18 UTC
+ *
+ * @pixi/filter-kawase-blur is licensed under the MIT License.
+ * http://www.opensource.org/licenses/mit-license
+ */
+
+
+
+var vertex = "attribute vec2 aVertexPosition;\nattribute vec2 aTextureCoord;\n\nuniform mat3 projectionMatrix;\n\nvarying vec2 vTextureCoord;\n\nvoid main(void)\n{\n    gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);\n    vTextureCoord = aTextureCoord;\n}";
+
+var fragment = "\nvarying vec2 vTextureCoord;\nuniform sampler2D uSampler;\n\nuniform vec2 uOffset;\n\nvoid main(void)\n{\n    vec4 color = vec4(0.0);\n\n    // Sample top left pixel\n    color += texture2D(uSampler, vec2(vTextureCoord.x - uOffset.x, vTextureCoord.y + uOffset.y));\n\n    // Sample top right pixel\n    color += texture2D(uSampler, vec2(vTextureCoord.x + uOffset.x, vTextureCoord.y + uOffset.y));\n\n    // Sample bottom right pixel\n    color += texture2D(uSampler, vec2(vTextureCoord.x + uOffset.x, vTextureCoord.y - uOffset.y));\n\n    // Sample bottom left pixel\n    color += texture2D(uSampler, vec2(vTextureCoord.x - uOffset.x, vTextureCoord.y - uOffset.y));\n\n    // Average\n    color *= 0.25;\n\n    gl_FragColor = color;\n}";
+
+var fragmentClamp = "\nvarying vec2 vTextureCoord;\nuniform sampler2D uSampler;\n\nuniform vec2 uOffset;\nuniform vec4 filterClamp;\n\nvoid main(void)\n{\n    vec4 color = vec4(0.0);\n\n    // Sample top left pixel\n    color += texture2D(uSampler, clamp(vec2(vTextureCoord.x - uOffset.x, vTextureCoord.y + uOffset.y), filterClamp.xy, filterClamp.zw));\n\n    // Sample top right pixel\n    color += texture2D(uSampler, clamp(vec2(vTextureCoord.x + uOffset.x, vTextureCoord.y + uOffset.y), filterClamp.xy, filterClamp.zw));\n\n    // Sample bottom right pixel\n    color += texture2D(uSampler, clamp(vec2(vTextureCoord.x + uOffset.x, vTextureCoord.y - uOffset.y), filterClamp.xy, filterClamp.zw));\n\n    // Sample bottom left pixel\n    color += texture2D(uSampler, clamp(vec2(vTextureCoord.x - uOffset.x, vTextureCoord.y - uOffset.y), filterClamp.xy, filterClamp.zw));\n\n    // Average\n    color *= 0.25;\n\n    gl_FragColor = color;\n}\n";
+
+/**
+ * A much faster blur than Gaussian blur, but more complicated to use.<br>
+ * ![original](../tools/screenshots/dist/original.png)![filter](../tools/screenshots/dist/kawase-blur.png)
+ *
+ * @see https://software.intel.com/en-us/blogs/2014/07/15/an-investigation-of-fast-real-time-gpu-based-image-blur-algorithms
+ * @class
+ * @extends PIXI.Filter
+ * @memberof PIXI.filters
+ * @see {@link https://www.npmjs.com/package/@pixi/filter-kawase-blur|@pixi/filter-kawase-blur}
+ * @see {@link https://www.npmjs.com/package/pixi-filters|pixi-filters}
+ * @param {number|number[]} [blur=4] - The blur of the filter. Should be greater than `0`. If
+ *        value is an Array, setting kernels.
+ * @param {number} [quality=3] - The quality of the filter. Should be an integer greater than `1`.
+ * @param {boolean} [clamp=false] - Clamp edges, useful for removing dark edges
+ *        from fullscreen filters or bleeding to the edge of filterArea.
+ */
+var KawaseBlurFilter = /*@__PURE__*/(function (Filter) {
+    function KawaseBlurFilter(blur, quality, clamp) {
+        if ( blur === void 0 ) blur = 4;
+        if ( quality === void 0 ) quality = 3;
+        if ( clamp === void 0 ) clamp = false;
+
+        Filter.call(this, vertex, clamp ? fragmentClamp : fragment);
+        this.uniforms.uOffset = new Float32Array(2);
+
+        this._pixelSize = new _pixi_math__WEBPACK_IMPORTED_MODULE_1__["Point"]();
+        this.pixelSize = 1;
+        this._clamp = clamp;
+        this._kernels = null;
+
+        // if `blur` is array , as kernels
+        if (Array.isArray(blur)) {
+            this.kernels = blur;
+        }
+        else {
+            this._blur = blur;
+            this.quality = quality;
+        }
+    }
+
+    if ( Filter ) KawaseBlurFilter.__proto__ = Filter;
+    KawaseBlurFilter.prototype = Object.create( Filter && Filter.prototype );
+    KawaseBlurFilter.prototype.constructor = KawaseBlurFilter;
+
+    var prototypeAccessors = { kernels: { configurable: true },clamp: { configurable: true },pixelSize: { configurable: true },quality: { configurable: true },blur: { configurable: true } };
+
+    /**
+     * Overrides apply
+     * @private
+     */
+    KawaseBlurFilter.prototype.apply = function apply (filterManager, input, output, clear) {
+        var uvX = this.pixelSize.x / input._frame.width;
+        var uvY = this.pixelSize.y / input._frame.height;
+        var offset;
+
+        if (this._quality === 1 || this._blur === 0) {
+            offset = this._kernels[0] + 0.5;
+            this.uniforms.uOffset[0] = offset * uvX;
+            this.uniforms.uOffset[1] = offset * uvY;
+            filterManager.applyFilter(this, input, output, clear);
+        }
+        else {
+            var renderTarget = filterManager.getFilterTexture();
+
+            var source = input;
+            var target = renderTarget;
+            var tmp;
+
+            var last = this._quality - 1;
+
+            for (var i = 0; i < last; i++) {
+                offset = this._kernels[i] + 0.5;
+                this.uniforms.uOffset[0] = offset * uvX;
+                this.uniforms.uOffset[1] = offset * uvY;
+                filterManager.applyFilter(this, source, target, 1);
+
+                tmp = source;
+                source = target;
+                target = tmp;
+            }
+            offset = this._kernels[last] + 0.5;
+            this.uniforms.uOffset[0] = offset * uvX;
+            this.uniforms.uOffset[1] = offset * uvY;
+            filterManager.applyFilter(this, source, output, clear);
+
+            filterManager.returnFilterTexture(renderTarget);
+        }
+    };
+
+    /**
+     * Auto generate kernels by blur & quality
+     * @private
+     */
+    KawaseBlurFilter.prototype._generateKernels = function _generateKernels () {
+        var blur = this._blur;
+        var quality = this._quality;
+        var kernels = [ blur ];
+
+        if (blur > 0) {
+            var k = blur;
+            var step = blur / quality;
+
+            for (var i = 1; i < quality; i++) {
+                k -= step;
+                kernels.push(k);
+            }
+        }
+
+        this._kernels = kernels;
+    };
+
+    /**
+     * The kernel size of the blur filter, for advanced usage.
+     *
+     * @member {number[]}
+     * @default [0]
+     */
+    prototypeAccessors.kernels.get = function () {
+        return this._kernels;
+    };
+    prototypeAccessors.kernels.set = function (value) {
+        if (Array.isArray(value) && value.length > 0) {
+            this._kernels = value;
+            this._quality = value.length;
+            this._blur = Math.max.apply(Math, value);
+        }
+        else {
+            // if value is invalid , set default value
+            this._kernels = [0];
+            this._quality = 1;
+        }
+    };
+
+    /**
+     * Get the if the filter is clampped.
+     *
+     * @readonly
+     * @member {boolean}
+     * @default false
+     */
+    prototypeAccessors.clamp.get = function () {
+        return this._clamp;
+    };
+
+    /**
+     * Sets the pixel size of the filter. Large size is blurrier. For advanced usage.
+     *
+     * @member {PIXI.Point|number[]}
+     * @default [1, 1]
+     */
+    prototypeAccessors.pixelSize.set = function (value) {
+        if (typeof value === 'number') {
+            this._pixelSize.x = value;
+            this._pixelSize.y = value;
+        }
+        else if (Array.isArray(value)) {
+            this._pixelSize.x = value[0];
+            this._pixelSize.y = value[1];
+        }
+        else if (value instanceof _pixi_math__WEBPACK_IMPORTED_MODULE_1__["Point"]) {
+            this._pixelSize.x = value.x;
+            this._pixelSize.y = value.y;
+        }
+        else {
+            // if value is invalid , set default value
+            this._pixelSize.x = 1;
+            this._pixelSize.y = 1;
+        }
+    };
+    prototypeAccessors.pixelSize.get = function () {
+        return this._pixelSize;
+    };
+
+    /**
+     * The quality of the filter, integer greater than `1`.
+     *
+     * @member {number}
+     * @default 3
+     */
+    prototypeAccessors.quality.get = function () {
+        return this._quality;
+    };
+    prototypeAccessors.quality.set = function (value) {
+        this._quality = Math.max(1, Math.round(value));
+        this._generateKernels();
+    };
+
+    /**
+     * The amount of blur, value greater than `0`.
+     *
+     * @member {number}
+     * @default 4
+     */
+    prototypeAccessors.blur.get = function () {
+        return this._blur;
+    };
+    prototypeAccessors.blur.set = function (value) {
+        this._blur = value;
+        this._generateKernels();
+    };
+
+    Object.defineProperties( KawaseBlurFilter.prototype, prototypeAccessors );
+
+    return KawaseBlurFilter;
+}(_pixi_core__WEBPACK_IMPORTED_MODULE_0__["Filter"]));
+
+
+//# sourceMappingURL=filter-kawase-blur.esm.js.map
 
 
 /***/ }),
@@ -46877,6 +47409,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! pixi.js */ "./node_modules/pixi.js/lib/pixi.es.js");
 /* harmony import */ var _initData__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./initData */ "./src/initData.js");
 /* harmony import */ var _easeFn__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./easeFn */ "./src/easeFn.js");
+/* harmony import */ var _pixi_filter_drop_shadow__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @pixi/filter-drop-shadow */ "./node_modules/@pixi/filter-drop-shadow/lib/filter-drop-shadow.esm.js");
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
@@ -46894,6 +47427,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
+
 pixi_js__WEBPACK_IMPORTED_MODULE_0__["utils"].sayHello(pixi_js__WEBPACK_IMPORTED_MODULE_0__["utils"].isWebGLSupported() ? "WebGL" : "CANVAS");
 var menuContainer = [];
 menuContainer.counter = 0;
@@ -46904,11 +47438,18 @@ var finalBuildFlag = false;
 var initRatio = _initData__WEBPACK_IMPORTED_MODULE_1__["initOpt"].initWidth / _initData__WEBPACK_IMPORTED_MODULE_1__["initOpt"].initHeight;
 var scaleAdd = 1;
 var isFirstResize = true;
+var appearAfterResizing = false;
 var isFinish = false;
 var dX = 0;
 var dY = 0;
 var menuCircleInit;
-var filter = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["filters"].AlphaFilter(0);
+var alphaFilter = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["filters"].AlphaFilter(1);
+var shadowFilter = new _pixi_filter_drop_shadow__WEBPACK_IMPORTED_MODULE_3__["DropShadowFilter"]({
+  rotation: -90,
+  distance: 5,
+  blur: 10
+});
+var resizeTimer = 0;
 
 var GameArea = /*#__PURE__*/function () {
   function GameArea() {
@@ -46926,6 +47467,7 @@ var GameArea = /*#__PURE__*/function () {
     };
     this.app = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Application"](this.options);
     this.container = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Container"]();
+    this.container.filters = [alphaFilter];
     this.container.sortableChildren = true;
     this.wrapper.append(this.app.view);
     this.app.stage.addChild(this.container);
@@ -47036,9 +47578,8 @@ var GameArea = /*#__PURE__*/function () {
   }, {
     key: "resize",
     value: function resize() {
-      var _this3 = this;
-
-      this.container.filters = [filter];
+      clearTimeout(resizeTimer);
+      alphaFilter.alpha = 0;
       console.log("windowRatio: ", windowRatio);
       scaleFactor = Math.min(this.wrapper.offsetWidth / _initData__WEBPACK_IMPORTED_MODULE_1__["initOpt"].initWidth, this.wrapper.offsetHeight / _initData__WEBPACK_IMPORTED_MODULE_1__["initOpt"].initHeight);
       windowRatio = (window.innerWidth / window.innerHeight).toFixed(2);
@@ -47106,6 +47647,7 @@ var GameArea = /*#__PURE__*/function () {
         this.wrapper.style.height = "".concat(scaleAdd * this.wrapper.offsetWidth / initRatio + dY, "px");
       } else if (windowRatio <= 1.43 && windowRatio >= 1) {
         menuCircleInit = _initData__WEBPACK_IMPORTED_MODULE_1__["XLmenuCircle"];
+        _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].rangeOfRotation = -Math.PI / 180 * 172;
         this.wrapper.style.height = "".concat(scaleAdd * this.wrapper.offsetWidth / initRatio + dY, "px");
 
         if (!isFirstResize) {
@@ -47118,6 +47660,14 @@ var GameArea = /*#__PURE__*/function () {
         this.wrapper.style.height = "".concat(scaleAdd * this.wrapper.offsetWidth / initRatio + dY, "px");
       } else if (windowRatio > 1.43) {
         menuCircleInit = _initData__WEBPACK_IMPORTED_MODULE_1__["XLmenuCircle"];
+        _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].rangeOfRotation = -Math.PI / 180 * 172;
+
+        if (!isFirstResize) {
+          this.logo.y = 20;
+          this.logo.x = 50;
+          this.resizingCorection();
+        }
+
         this.wrapper.style.height = "100vh";
         this.wrapper.style.width = "".concat(scaleAdd * this.wrapper.offsetHeight * initRatio + dX, "px");
       }
@@ -47129,14 +47679,14 @@ var GameArea = /*#__PURE__*/function () {
       this.container.x = dX;
       this.container.y = dY;
       isFirstResize = false;
-      setTimeout(function () {
-        return _this3.container.filters = [];
-      }, 2000);
+      resizeTimer = setTimeout(function () {
+        appearAfterResizing = true;
+      }, 500);
     }
   }, {
     key: "createMenu",
     value: function createMenu(resources) {
-      var _this4 = this;
+      var _this3 = this;
 
       var menuNamesArr = menuCircleInit.stairs;
 
@@ -47179,10 +47729,10 @@ var GameArea = /*#__PURE__*/function () {
         containerMenu.mask = mask;
         containerMenu.buttonMode = true;
         containerMenu.on('click', function (e) {
-          return _this4.clickOnMenu.call(_this4, e, resources);
+          return _this3.clickOnMenu.call(_this3, e, resources);
         });
         containerMenu.on('tap', function (e) {
-          return _this4.clickOnMenu.call(_this4, e, resources);
+          return _this3.clickOnMenu.call(_this3, e, resources);
         });
         this.container.addChild(containerMenu);
         var menu_ex = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"](resources[nameMenu].texture);
@@ -47250,7 +47800,7 @@ var GameArea = /*#__PURE__*/function () {
   }, {
     key: "recolorizeOldMenu",
     value: function recolorizeOldMenu() {
-      var _this5 = this;
+      var _this4 = this;
 
       menuContainer.forEach(function (item) {
         var grd = item.children.find(function (val) {
@@ -47262,7 +47812,7 @@ var GameArea = /*#__PURE__*/function () {
           baseTexture: true
         });
 
-        var grdCircle = _this5.createCircleGrad(60, "#FFF6DA", "#F6DBB6");
+        var grdCircle = _this4.createCircleGrad(60, "#FFF6DA", "#F6DBB6");
 
         grdCircle.zIndex = 8;
         item.isChecked["false"];
@@ -47304,6 +47854,7 @@ var GameArea = /*#__PURE__*/function () {
       this.ok.name = e.target.name;
       this.ok.alpha = 0;
       this.ok.shadeOut = true;
+      this.ok.filters = [shadowFilter];
       this.ok.position.set(currentContainer.x - 70, currentContainer.y + 60);
       var currentStair = menuCircleInit.stairs.find(function (item) {
         return item.nameStair === currentContainer.name;
@@ -47448,8 +47999,20 @@ var GameArea = /*#__PURE__*/function () {
       }
     }
   }, {
+    key: "afterResizingAppearance",
+    value: function afterResizingAppearance() {
+      if (appearAfterResizing) {
+        alphaFilter.alpha += 0.03;
+
+        if (alphaFilter.alpha >= 1) {
+          appearAfterResizing = false;
+        }
+      }
+    }
+  }, {
     key: "ticker",
     value: function ticker() {
+      this.afterResizingAppearance();
       this.okAppear();
       this.btnMoving();
       this.newStairsAppear();
@@ -47472,7 +48035,7 @@ var game = new GameArea();
 /*!*************************!*\
   !*** ./src/initData.js ***!
   \*************************/
-/*! exports provided: arrImg, initOpt, animation, menuCircle, textureObj, SMmenuCircle, XSmenuCircle, XLmenuCircle */
+/*! exports provided: arrImg, initOpt, animation, textureObj, SMmenuCircle, XSmenuCircle, XLmenuCircle */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -47480,7 +48043,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "arrImg", function() { return arrImg; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "initOpt", function() { return initOpt; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "animation", function() { return animation; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "menuCircle", function() { return menuCircle; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "textureObj", function() { return textureObj; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SMmenuCircle", function() { return SMmenuCircle; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "XSmenuCircle", function() { return XSmenuCircle; });
@@ -47546,7 +48108,7 @@ var initOpt = {
 };
 var animation = {
   logoAnimTime: null,
-  logoDuration: 1000,
+  logoDuration: 1300,
   logoStart: -600,
   logoTrack: 650,
   stairsStart: -100,
@@ -47576,7 +48138,7 @@ var textureObj = {
     alpha: 0,
     alphaSpeed: 0.04,
     visible: false,
-    zIndex: 8,
+    zIndex: 9,
     buttonMode: true,
     interactive: true
   },
@@ -47639,41 +48201,12 @@ var textureObj = {
     increment: 0.03
   }
 };
-var menuCircle = {
-  speed: -0.05,
-  acceleration: 1.035,
-  centerX: 1100,
-  centerY: 550,
-  R: 410,
-  direction: 1,
-  stairs: [{
-    nameMenu: "menu_ex1",
-    nameStair: "new_1",
-    alignMenu: [-40, -100],
-    alignStairs: [835, 90],
-    initAngle: Math.PI / 180 * 30
-  }, {
-    nameMenu: "menu_ex2",
-    nameStair: "new_2",
-    alignMenu: [-40, -135],
-    alignStairs: [835, 100],
-    initAngle: Math.PI / 180 * 55
-  }, {
-    nameMenu: "menu_ex3",
-    nameStair: "new_3",
-    alignMenu: [-42, -62],
-    alignStairs: [850, 55],
-    initAngle: Math.PI / 180 * 80
-  }],
-  rangeAngle: Math.PI / 180 * 60
-};
 var XLmenuCircle = {
   speed: -0.05,
   acceleration: 1.035,
   centerX: 1100,
   centerY: 550,
   R: 410,
-  direction: 1,
   stairs: [{
     nameMenu: "menu_ex1",
     nameStair: "new_1",
@@ -47695,8 +48228,7 @@ var XLmenuCircle = {
     menuAfterRotation: [1141.06, 142.06],
     alignStairs: [850, 55],
     initAngle: Math.PI / 180 * 80
-  }],
-  rangeAngle: Math.PI / 180 * 60
+  }]
 };
 var XSmenuCircle = {
   speed: -0.05,
@@ -47704,7 +48236,6 @@ var XSmenuCircle = {
   centerX: 800,
   centerY: 680,
   R: 380,
-  direction: 1,
   stairs: [{
     nameMenu: "menu_ex1",
     nameStair: "new_1",
@@ -47726,8 +48257,7 @@ var XSmenuCircle = {
     alignMenu: [-42, -62],
     alignStairs: [715, 55],
     initAngle: Math.PI / 180 * 85
-  }],
-  rangeAngle: Math.PI / 180 * 60
+  }]
 };
 var SMmenuCircle = {
   speed: -0.05,
@@ -47735,7 +48265,6 @@ var SMmenuCircle = {
   centerX: 800,
   centerY: 830,
   R: 400,
-  direction: 1,
   stairs: [{
     nameMenu: "menu_ex1",
     nameStair: "new_1",
@@ -47757,8 +48286,7 @@ var SMmenuCircle = {
     menuAfterRotation: [950.56, 459.4],
     alignStairs: [850, 55],
     initAngle: Math.PI / 180 * 80
-  }],
-  rangeAngle: Math.PI / 180 * 60
+  }]
 };
 
 

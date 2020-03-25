@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 import {arrImg, initOpt, animation, textureObj, SMmenuCircle, XSmenuCircle, XLmenuCircle} from './initData';
 import {easeOutSine, easeInQuart} from './easeFn';
+import {DropShadowFilter} from '@pixi/filter-drop-shadow';
 
 PIXI.utils.sayHello(PIXI.utils.isWebGLSupported() ? "WebGL": "CANVAS");
 
@@ -13,12 +14,14 @@ let finalBuildFlag = false;
 let initRatio = initOpt.initWidth/initOpt.initHeight;
 let scaleAdd = 1;
 let isFirstResize = true;
+let appearAfterResizing = false;
 let isFinish = false;
 let dX = 0;
 let dY = 0;
 let menuCircleInit;
-const filter = new PIXI.filters.AlphaFilter(0);
-
+const alphaFilter = new PIXI.filters.AlphaFilter(1);
+const shadowFilter = new DropShadowFilter({rotation:-90, distance: 5, blur: 10});
+let resizeTimer = 0;
 
 class GameArea {
     constructor() {
@@ -36,14 +39,15 @@ class GameArea {
 
         this.app = new PIXI.Application(this.options);        
         this.container = new PIXI.Container();
+        this.container.filters = [alphaFilter];
         this.container.sortableChildren = true;        
 
         this.wrapper.append(this.app.view);
         this.app.stage.addChild(this.container);
 
         window.addEventListener('resize', this.resize.bind(this));
-        this.resize();        
-
+        this.resize();   
+        
         this.app.loader
             .add(arrImg)
             .on('error', (e) => console.log('error:', e.message))
@@ -134,7 +138,9 @@ class GameArea {
     }
 
     resize() {
-        this.container.filters = [filter]
+
+        clearTimeout(resizeTimer);
+        alphaFilter.alpha = 0;
         console.log("windowRatio: ", windowRatio);
         
         scaleFactor = Math.min(
@@ -142,7 +148,7 @@ class GameArea {
             this.wrapper.offsetHeight / initOpt.initHeight,
         )
         windowRatio = (window.innerWidth / window.innerHeight).toFixed(2);
-        
+       
         scaleAdd = 1;
         dX = 0;
         dY = 0;
@@ -210,6 +216,7 @@ class GameArea {
 
         } else if (windowRatio <= 1.43 && windowRatio >= 1) {
             menuCircleInit = XLmenuCircle;
+            animation.rangeOfRotation = -Math.PI/180*172;
             this.wrapper.style.height = `${scaleAdd * this.wrapper.offsetWidth / initRatio + dY}px`;
             if(!isFirstResize) {
                 this.logo.y= 20
@@ -221,6 +228,12 @@ class GameArea {
 
         } else if (windowRatio > 1.43) {
             menuCircleInit = XLmenuCircle;
+            animation.rangeOfRotation = -Math.PI/180*172;
+            if(!isFirstResize) {
+                this.logo.y= 20
+                this.logo.x = 50
+                this.resizingCorection();  
+            }
             this.wrapper.style.height = "100vh";
             this.wrapper.style.width = `${scaleAdd * this.wrapper.offsetHeight * initRatio + dX}px`;
         }       
@@ -233,7 +246,9 @@ class GameArea {
         this.container.x = dX;
         this.container.y = dY;
         isFirstResize = false;
-        setTimeout(() => this.container.filters = [], 2000)
+        resizeTimer = setTimeout(() => {
+            appearAfterResizing = true;
+        }, 500)
     }
  
     createMenu(resources) {
@@ -383,7 +398,8 @@ class GameArea {
         this.ok.visible = true;
         this.ok.name = e.target.name;
         this.ok.alpha = 0;
-        this.ok.shadeOut = true;        
+        this.ok.shadeOut = true;
+        this.ok.filters = [shadowFilter];        
         this.ok.position.set(currentContainer.x - 70, currentContainer.y + 60);
         let currentStair = menuCircleInit.stairs.find(item => item.nameStair === currentContainer.name);
 
@@ -513,7 +529,17 @@ class GameArea {
         }
     }
 
-    ticker() {        
+    afterResizingAppearance() {
+        if(appearAfterResizing) {
+            alphaFilter.alpha += 0.03;
+            if(alphaFilter.alpha >= 1) {
+                appearAfterResizing = false;
+            }
+        }
+    }
+
+    ticker() {    
+        this.afterResizingAppearance();    
         this.okAppear();
         this.btnMoving();
         this.newStairsAppear();
