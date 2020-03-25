@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 import {arrImg, initOpt, animation, textureObj, SMmenuCircle, XSmenuCircle, XLmenuCircle} from './initData';
 import {easeOutSine, easeInQuart} from './easeFn';
 import {DropShadowFilter} from '@pixi/filter-drop-shadow';
-import pixiSound from 'pixi-sound';
+//import pixiSound from 'pixi-sound';
 
 PIXI.utils.sayHello(PIXI.utils.isWebGLSupported() ? "WebGL": "CANVAS");
 
@@ -21,6 +21,7 @@ let dX = 0;
 let dY = 0;
 let menuCircleInit;
 const alphaFilter = new PIXI.filters.AlphaFilter(1);
+alphaFilter.resolution = window.devicePixelRatio || 1;
 const shadowFilter = new DropShadowFilter({rotation:-90, distance: 5, blur: 10});
 let resizeTimer = 0;
 
@@ -41,6 +42,7 @@ class GameArea {
         this.app = new PIXI.Application(this.options);        
         this.container = new PIXI.Container();
         this.container.filters = [alphaFilter];
+
         this.container.sortableChildren = true;        
 
         this.wrapper.append(this.app.view);
@@ -77,8 +79,7 @@ class GameArea {
     loader(loader, resources) {
         this.resources = resources;
         
-        pixiSound.play('theme', { loop: true })
-        
+        //pixiSound.play('theme', { loop: true })        
         
         let textureToLoadArr = ["bg", "austin", "ok", "hummer", "dec_1", "dec_2", "btn", "logo", "old"];
 
