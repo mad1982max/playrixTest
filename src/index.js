@@ -7,9 +7,14 @@ PIXI.utils.sayHello(PIXI.utils.isWebGLSupported() ? "WebGL": "CANVAS");
 let menuContainer = [];
 menuContainer.counter = 0;
 let scaleFactor = 1;
+let windowRatio = 1;
 let finishBuildStair = false;
 let finalBuildFlag = false;
 let initRatio = initOpt.initWidth/initOpt.initHeight;
+let scaleAdd = 1;
+let isFirstResize = true;
+let dX = 0;
+let dY = 0;
 
 class GameArea {
     constructor() {
@@ -61,16 +66,16 @@ class GameArea {
         
     }
 
-    loader(loader, resources) {
+    startGame() {
         let textureToLoadArr = ["bg", "austin", "ok", "hummer", "dec_1", "dec_2", "btn", "logo", "old"];
 
         for (let texture of textureToLoadArr) {
-            this.insertTexture(texture, resources, this.container)
-        }
-        
-        let centerX = Math.floor(0.5*(this.app.view.width/scaleFactor/this.options.resolution - this.btn.width));
-        this.btn.x = centerX;
+            this.insertTexture(texture, this.resources, this.container)
+        }        
 
+        let centerX = 0.5*(this.wrapper.offsetWidth/ scaleFactor / scaleAdd - this.btn.width - 2*dX/scaleFactor/ scaleAdd);
+
+        this.btn.x = centerX;
         animation.logoAnimTime = Date.now();
 
         this.btn.on('tap', () => console.log('continue'));
@@ -80,7 +85,7 @@ class GameArea {
             this.changeStairs(e, resources);
         });
         this.ok.on('tap', (e) => {
-            this.changeStairs(e, resources);
+            this.changeStairs(e, this.resources);
         });
 
         this.hummer.on('click', () => {
@@ -92,27 +97,319 @@ class GameArea {
             this.showMenu();
         })
 
-        this.createMenu(resources);            
+        this.createMenu(this.resources);            
         this.app.ticker.add(this.ticker.bind(this));
+    }
 
+    loader(loader, resources) {
+        this.resources = resources;
+        this.startGame(this.resources);
     }
 
     resize() {
-        this.wrapper.style.height = `${this.wrapper.offsetWidth / initRatio}px`;
         
         scaleFactor = Math.min(
             this.wrapper.offsetWidth / initOpt.initWidth,
             this.wrapper.offsetHeight / initOpt.initHeight,
         )
+        windowRatio = (window.innerWidth / window.innerHeight).toFixed(2);
+
+        scaleAdd = 1;
+        dX = 0;
+        dY = 0;
+
+        if(windowRatio < 0.57) {
+            scaleAdd = 2.3;
+            dX = -800 * scaleFactor;
+            dY = 100* scaleFactor;
+
+            if(isFirstResize) {
+                
+                animation.logoTrack = 970;
+                textureObj.logo.y = -20;
+                
+                textureObj.old.x = 550
+                textureObj.hummer.x = 730;
+                textureObj.hummer.y = 380;
+                textureObj.dec_1.x = 820;
+                textureObj.dec_1.y = 560;
+                
+                menuCircle.stairs = [
+                        {
+                            nameMenu: "menu_ex1",
+                            nameStair: "new_1",
+                            alignMenu: [-40,-100],
+                            alignStairs: [700, 90],
+                            initAngle: Math.PI/180*25
+                        },
+                        {
+                            nameMenu: "menu_ex2",
+                            nameStair: "new_2",
+                            alignMenu: [-40,-135],
+                            alignStairs: [700, 100],
+                            initAngle: Math.PI/180*55
+                        },
+                        {
+                            nameMenu: "menu_ex3",
+                            nameStair: "new_3",
+                            alignMenu: [-42,-62],
+                            alignStairs: [715, 55],
+                            initAngle: Math.PI/180*85
+                        }
+                    ];            
+                menuCircle.centerX = 800;
+                menuCircle.centerY = 680;
+                menuCircle.R = 380;
+                animation.rangeOfRotation = -Math.PI/180*173;            
+                document.body.style.backgroundColor = "yellow";
+
+            } else {
+
+                animation.logoTrack = 970;
+                textureObj.logo.y = -20;
+                this.logo.y = -20;
+                this.logo.x = 360;
+                this.old.x = 550;
+                this.hummer.x = 730;
+                this.hummer.y = 380;
+                this.btn.y = 700;
+
+                this.dec_1.x = 820;
+                this.dec_1.y = 560;
+
+                if(!animation.menuMovingFlag && !animation.menuMovingEnd) {
+                    menuContainer.forEach(item => {
+                        item.destroy(); 
+                        menuContainer = [];                       
+                    });
+                    menuCircle.centerX = 800;
+                    menuCircle.centerY = 680;
+                    menuCircle.R = 380;
+                    animation.rangeOfRotation = -Math.PI/180*160;
+                    this.createMenu(this.resources);
+
+
+                }  else if (animation.menuMovingEnd) {
+                    let smallMenuCoord = [
+                        {
+                            name: "new_1",
+                            x: 478.22,
+                            y: 477.87
+                        },
+                        {
+                            name: "new_2",
+                            x: 622.39,
+                            y: 344.05
+                        },
+                        {
+                            name: "new_3",
+                            x: 814.15,
+                            y: 300.26
+                        },
+        
+                    ]
+                    menuCircle.stairs = [
+                        {
+                            nameMenu: "menu_ex1",
+                            nameStair: "new_1",
+                            alignMenu: [-40,-100],
+                            alignStairs: [700, 90],
+                            initAngle: Math.PI/180*25
+                        },
+                        {
+                            nameMenu: "menu_ex2",
+                            nameStair: "new_2",
+                            alignMenu: [-40,-135],
+                            alignStairs: [700, 100],
+                            initAngle: Math.PI/180*55
+                        },
+                        {
+                            nameMenu: "menu_ex3",
+                            nameStair: "new_3",
+                            alignMenu: [-42,-62],
+                            alignStairs: [715, 55],
+                            initAngle: Math.PI/180*85
+                        }
+                    ]; 
+
+
+                    menuContainer.forEach(item => {
+                        let currentStairs = smallMenuCoord.find(val => val.name === item.name);
+                        item.x = currentStairs.x;
+                        item.y = currentStairs.y;
+                        if(item.isChecked) {
+
+                            this.ok.x = item.x - 70;
+                            this.ok.y = item.y + 60;
+                            console.log(item.name);
+                            
+
+                            let coordNewStairs = menuCircle.stairs.find(newItem => {
+                                console.log(newItem.nameStair, item.name);
+                                return newItem.nameStair === item.name;
+                                
+                                
+                            })
+                            console.log('coordNewStairs', coordNewStairs);
+                            
+                            this.newStairs.x = coordNewStairs.alignStairs[0];
+                            this.newStairs.y = coordNewStairs.alignStairs[1];
+                        }
+                    })
+                }              
+         
+                document.body.style.backgroundColor = "yellow";
+            }
+
+        } else if(windowRatio >= 0.57 && windowRatio < 1) {
+            scaleAdd = 1.45;
+            dX = -380* scaleFactor;
+            dY = 30* scaleFactor;
+
+            if(isFirstResize) {
+
+                animation.logoTrack = 870;
+                textureObj.logo.y = 0;
+
+                textureObj.hummer.x = 920;
+                textureObj.hummer.y = 400;
+                textureObj.btn.y = 670;    
+                           
+                menuCircle.centerX = 800;
+                menuCircle.centerY = 830;
+                menuCircle.R = 400;
+                animation.rangeOfRotation = -Math.PI/180*150;
+                document.body.style.backgroundColor = "red";
+
+            } else {
+                animation.logoTrack = 870;
+                this.logo.y = 0;
+                this.logo.x = 300;
+                this.old.x = 735;
+                this.old.y = 135;
+                this.hummer.x = 920;
+                this.hummer.y = 400;
+                this.btn.y = 670;
+                this.dec_1.x = 1020;
+                this.dec_1.y = 520;
+
+                if(!animation.menuMovingFlag && !animation.menuMovingEnd) {
+                    menuContainer.forEach(item => {
+                        item.destroy(); 
+                        menuContainer = [];                       
+                    });
+                    menuCircle.centerX = 800;
+                    menuCircle.centerY = 830;
+                    menuCircle.R = 400;
+                    this.createMenu(this.resources);
+                } else if(animation.menuMovingEnd) {
+                    let mediumMenuCoord = [
+                        {
+                            name: "new_1",
+                            x: 612.9,
+                            y: 476.45
+                        },
+                        {
+                            name: "new_2",
+                            x: 779.84,
+                            y: 430.5
+                        },
+                        {
+                            name: "new_3",
+                            x: 950.56,
+                            y: 459.4
+                        },
+        
+                    ]
+
+
+                    menuContainer.forEach(item => {
+                        let currentStairs = mediumMenuCoord.find(val => val.name === item.name);
+                        item.x = currentStairs.x;
+                        item.y = currentStairs.y;
+                        if(item.isChecked) {
+                            this.ok.x = item.x - 70;
+                            this.ok.y = item.y + 60
+                        }
+                    })
+                }
+                document.body.style.backgroundColor = "red";
+            }
+            
+            
+
+        } else if (windowRatio <= 1.43 && windowRatio > 1) {
+            document.body.style.backgroundColor = "orange";
+            console.log('<= 2 >1');
+            if(isFirstResize) {
+
+            } else {
+                this.logo.y= 20
+                this.logo.x = 50
+                if(!animation.menuMovingFlag && !animation.menuMovingEnd) {
+                    menuContainer.forEach(item => {
+                        item.destroy(); 
+                        menuContainer = [];                       
+                    });
+                    menuCircle.centerX = 1100;
+                    menuCircle.centerY = 550;
+                    menuCircle.R = 410;
+                    animation.rangeOfRotation = -Math.PI/180*170;
+                    this.createMenu(this.resources);
+                } else if(animation.menuMovingEnd) {
+                    let largeMenuCoord = [
+                        {
+                            name: "new_1",
+                            x: 813.9,
+                            y: 256.32
+                        },
+                        {
+                            name: "new_2",
+                            x: 964.82,
+                            y: 162.9
+                        },
+                        {
+                            name: "new_3",
+                            x: 1141.06,
+                            y: 142.06
+                        },
+        
+                    ]
+
+
+                    menuContainer.forEach(item => {
+                        let currentStairs = largeMenuCoord.find(val => val.name === item.name);
+                        item.x = currentStairs.x;
+                        item.y = currentStairs.y;
+                        if(item.isChecked) {
+                            this.ok.x = item.x - 70;
+                            this.ok.y = item.y + 60
+                        }
+                    })
+                }
+            }
+        } else if (windowRatio > 1.43) {
+            document.body.style.backgroundColor = "black";
+            console.log('>= 2');
+            this.wrapper.style.width = `${scaleAdd * this.wrapper.offsetHeight * initRatio + dX}px`;
+
+
+        }       
+       
+        
+        this.wrapper.style.height = `${scaleAdd * this.wrapper.offsetWidth / initRatio + dY}px`;
 
         const newWidth = Math.ceil(initOpt.initWidth * scaleFactor);
         const newHeight = Math.ceil(initOpt.initHeight * scaleFactor);  
         
         this.app.resize(newWidth, newHeight);
-        this.container.scale.set(scaleFactor); 
+        this.container.scale.set(scaleFactor * scaleAdd); 
+        this.container.x = dX;
+        this.container.y = dY;
+        isFirstResize = false
     }
 
-    
+//-------------------------------------------------    
     createMenu(resources) {
         let menuNamesArr = menuCircle.stairs;
         for (let i = 0; i < menuNamesArr.length; i++) {
@@ -194,31 +491,45 @@ class GameArea {
     }
 
     showFinal(resources) {
+
         let finalArr = ["final_l2", "final_l1"];
 
         for(let finalSceneTexture of finalArr) {
             this.insertTexture(finalSceneTexture, resources, this.container)
         }
 
-        this.final_l2.height = this.app.view.height/scaleFactor/this.options.resolution;
+        this.final_l2.height = this.wrapper.offsetHeight / scaleFactor;
+        this.final_l2.y = -dY/scaleFactor;
 
-        let centerXfinal = Math.floor(0.5*(this.app.view.width/scaleFactor/this.options.resolution-this.final_l1.width));
-        let centerYfinal = Math.floor(0.5*(this.app.view.height/scaleFactor/this.options.resolution-this.final_l1.height));
-        this.final_l1.position.set(centerXfinal,centerYfinal);
+        let ratioWidthFinal = this.final_l1.width/this.final_l1.height
+        
+        this.final_l1.width = this.wrapper.offsetWidth / scaleFactor / scaleAdd *0.9;
+        this.final_l1.height= this.final_l1.width/ratioWidthFinal;
+        
+        //let cX = 0.5*(this.wrapper.offsetWidth/ scaleFactor - this.final_l1.width);
+        let cY = 0.33*(this.wrapper.offsetHeight/ scaleFactor / scaleAdd - this.final_l1.height) -2*dY/ scaleFactor / scaleAdd;
+
+        let cX= 0.5*(this.wrapper.offsetWidth/ scaleFactor / scaleAdd - this.final_l1.width - 2*dX/scaleFactor/ scaleAdd);
+
+        this.final_l1.position.set(cX, cY);
+
+        
+        
+
         
         finalBuildFlag = true;
     }
 
     recolorizeOldMenu() {
         menuContainer.forEach(item => {           
-            if(item.isChecked) {               
+            // if(item.isChecked) {               
                 let grd = item.children.find(val => val.name === 'grd');
                 grd.destroy({children:true, texture:true, baseTexture:true});
                 let grdCircle = this.createCircleGrad(60, "#FFF6DA", "#F6DBB6");  
                 grdCircle.zIndex = 8;
                 item.isChecked.false;
                 item.addChild(grdCircle); 
-            }
+            // }
         })
     }
 
@@ -233,8 +544,12 @@ class GameArea {
     }
 
     clickOnMenu(e, resources) {
+        
+        menuContainer.forEach(item => item.isChecked = false);
+
         let currentContainer = e.target;
         currentContainer.isChecked = true;
+        this.colorizeChekedMenu(currentContainer);
 
         if(this.newStairs) {
             this.newStairs.destroy();
@@ -245,13 +560,13 @@ class GameArea {
                         
         }
         
-        this.colorizeChekedMenu(currentContainer);       
+               
                   
         this.ok.visible = true;
         this.ok.name = e.target.name;
         this.ok.alpha = 0;
         this.ok.shadeOut = true;        
-        this.ok.position.set(currentContainer.x - 70, currentContainer.y + 65);
+        this.ok.position.set(currentContainer.x - 70, currentContainer.y + 60);
 
         let currentStair = menuCircle.stairs.find(item => item.nameStair === currentContainer.name);
 
@@ -291,7 +606,7 @@ class GameArea {
         let multer = this.btn.increaseFlag ? this.btn.pace : 1/this.btn.pace
         this.btn.curentRatio *= multer;
         this.btn.scale.set(this.btn.curentRatio.toFixed(3));
-        let centerX = Math.floor(0.5*(this.app.view.width/scaleFactor/this.options.resolution-this.btn.width));
+        let centerX = 0.5*(this.wrapper.offsetWidth/ scaleFactor / scaleAdd - this.btn.width - 2*dX/scaleFactor/ scaleAdd);
         this.btn.x = centerX;         
     }
 
@@ -325,7 +640,12 @@ class GameArea {
             let {currentRotation, initAngle} = menuContainer[0];
            
             if(currentRotation - initAngle <=  animation.rangeOfRotation) {
-                animation.menuMovingFlag = false;                
+                animation.menuMovingFlag = false;
+                animation.menuMovingEnd = true;
+                menuContainer.forEach(item => console.log(item.x, item.y, item.name)
+                );
+            
+                              
             }
         }
     }

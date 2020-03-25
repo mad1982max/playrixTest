@@ -46898,9 +46898,14 @@ pixi_js__WEBPACK_IMPORTED_MODULE_0__["utils"].sayHello(pixi_js__WEBPACK_IMPORTED
 var menuContainer = [];
 menuContainer.counter = 0;
 var scaleFactor = 1;
+var windowRatio = 1;
 var finishBuildStair = false;
 var finalBuildFlag = false;
 var initRatio = _initData__WEBPACK_IMPORTED_MODULE_1__["initOpt"].initWidth / _initData__WEBPACK_IMPORTED_MODULE_1__["initOpt"].initHeight;
+var scaleAdd = 1;
+var isFirstResize = true;
+var dX = 0;
+var dY = 0;
 
 var GameArea = /*#__PURE__*/function () {
   function GameArea() {
@@ -46955,18 +46960,18 @@ var GameArea = /*#__PURE__*/function () {
       parent.addChild(this[name]);
     }
   }, {
-    key: "loader",
-    value: function loader(_loader, resources) {
+    key: "startGame",
+    value: function startGame() {
       var _this = this;
 
       var textureToLoadArr = ["bg", "austin", "ok", "hummer", "dec_1", "dec_2", "btn", "logo", "old"];
 
       for (var _i2 = 0, _textureToLoadArr = textureToLoadArr; _i2 < _textureToLoadArr.length; _i2++) {
         var texture = _textureToLoadArr[_i2];
-        this.insertTexture(texture, resources, this.container);
+        this.insertTexture(texture, this.resources, this.container);
       }
 
-      var centerX = Math.floor(0.5 * (this.app.view.width / scaleFactor / this.options.resolution - this.btn.width));
+      var centerX = 0.5 * (this.wrapper.offsetWidth / scaleFactor / scaleAdd - this.btn.width - 2 * dX / scaleFactor / scaleAdd);
       this.btn.x = centerX;
       _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].logoAnimTime = Date.now();
       this.btn.on('tap', function () {
@@ -46979,7 +46984,7 @@ var GameArea = /*#__PURE__*/function () {
         _this.changeStairs(e, resources);
       });
       this.ok.on('tap', function (e) {
-        _this.changeStairs(e, resources);
+        _this.changeStairs(e, _this.resources);
       });
       this.hummer.on('click', function () {
         _this.hummer.visible = false;
@@ -46991,23 +46996,275 @@ var GameArea = /*#__PURE__*/function () {
 
         _this.showMenu();
       });
-      this.createMenu(resources);
+      this.createMenu(this.resources);
       this.app.ticker.add(this.ticker.bind(this));
+    }
+  }, {
+    key: "loader",
+    value: function loader(_loader, resources) {
+      this.resources = resources;
+      this.startGame(this.resources);
     }
   }, {
     key: "resize",
     value: function resize() {
-      this.wrapper.style.height = "".concat(this.wrapper.offsetWidth / initRatio, "px");
+      var _this2 = this;
+
       scaleFactor = Math.min(this.wrapper.offsetWidth / _initData__WEBPACK_IMPORTED_MODULE_1__["initOpt"].initWidth, this.wrapper.offsetHeight / _initData__WEBPACK_IMPORTED_MODULE_1__["initOpt"].initHeight);
+      windowRatio = (window.innerWidth / window.innerHeight).toFixed(2);
+      scaleAdd = 1;
+      dX = 0;
+      dY = 0;
+
+      if (windowRatio < 0.57) {
+        scaleAdd = 2.3;
+        dX = -800 * scaleFactor;
+        dY = 100 * scaleFactor;
+
+        if (isFirstResize) {
+          _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].logoTrack = 970;
+          _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].logo.y = -20;
+          _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].old.x = 550;
+          _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].hummer.x = 730;
+          _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].hummer.y = 380;
+          _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].dec_1.x = 820;
+          _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].dec_1.y = 560;
+          _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].stairs = [{
+            nameMenu: "menu_ex1",
+            nameStair: "new_1",
+            alignMenu: [-40, -100],
+            alignStairs: [700, 90],
+            initAngle: Math.PI / 180 * 25
+          }, {
+            nameMenu: "menu_ex2",
+            nameStair: "new_2",
+            alignMenu: [-40, -135],
+            alignStairs: [700, 100],
+            initAngle: Math.PI / 180 * 55
+          }, {
+            nameMenu: "menu_ex3",
+            nameStair: "new_3",
+            alignMenu: [-42, -62],
+            alignStairs: [715, 55],
+            initAngle: Math.PI / 180 * 85
+          }];
+          _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerX = 800;
+          _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerY = 680;
+          _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].R = 380;
+          _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].rangeOfRotation = -Math.PI / 180 * 173;
+          document.body.style.backgroundColor = "yellow";
+        } else {
+          _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].logoTrack = 970;
+          _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].logo.y = -20;
+          this.logo.y = -20;
+          this.logo.x = 360;
+          this.old.x = 550;
+          this.hummer.x = 730;
+          this.hummer.y = 380;
+          this.btn.y = 700;
+          this.dec_1.x = 820;
+          this.dec_1.y = 560;
+
+          if (!_initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingFlag && !_initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingEnd) {
+            menuContainer.forEach(function (item) {
+              item.destroy();
+              menuContainer = [];
+            });
+            _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerX = 800;
+            _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerY = 680;
+            _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].R = 380;
+            _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].rangeOfRotation = -Math.PI / 180 * 160;
+            this.createMenu(this.resources);
+          } else if (_initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingEnd) {
+            var smallMenuCoord = [{
+              name: "new_1",
+              x: 478.22,
+              y: 477.87
+            }, {
+              name: "new_2",
+              x: 622.39,
+              y: 344.05
+            }, {
+              name: "new_3",
+              x: 814.15,
+              y: 300.26
+            }];
+            _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].stairs = [{
+              nameMenu: "menu_ex1",
+              nameStair: "new_1",
+              alignMenu: [-40, -100],
+              alignStairs: [700, 90],
+              initAngle: Math.PI / 180 * 25
+            }, {
+              nameMenu: "menu_ex2",
+              nameStair: "new_2",
+              alignMenu: [-40, -135],
+              alignStairs: [700, 100],
+              initAngle: Math.PI / 180 * 55
+            }, {
+              nameMenu: "menu_ex3",
+              nameStair: "new_3",
+              alignMenu: [-42, -62],
+              alignStairs: [715, 55],
+              initAngle: Math.PI / 180 * 85
+            }];
+            menuContainer.forEach(function (item) {
+              var currentStairs = smallMenuCoord.find(function (val) {
+                return val.name === item.name;
+              });
+              item.x = currentStairs.x;
+              item.y = currentStairs.y;
+
+              if (item.isChecked) {
+                _this2.ok.x = item.x - 70;
+                _this2.ok.y = item.y + 60;
+                console.log(item.name);
+                var coordNewStairs = _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].stairs.find(function (newItem) {
+                  console.log(newItem.nameStair, item.name);
+                  return newItem.nameStair === item.name;
+                });
+                console.log('coordNewStairs', coordNewStairs);
+                _this2.newStairs.x = coordNewStairs.alignStairs[0];
+                _this2.newStairs.y = coordNewStairs.alignStairs[1];
+              }
+            });
+          }
+
+          document.body.style.backgroundColor = "yellow";
+        }
+      } else if (windowRatio >= 0.57 && windowRatio < 1) {
+        scaleAdd = 1.45;
+        dX = -380 * scaleFactor;
+        dY = 30 * scaleFactor;
+
+        if (isFirstResize) {
+          _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].logoTrack = 870;
+          _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].logo.y = 0;
+          _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].hummer.x = 920;
+          _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].hummer.y = 400;
+          _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].btn.y = 670;
+          _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerX = 800;
+          _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerY = 830;
+          _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].R = 400;
+          _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].rangeOfRotation = -Math.PI / 180 * 150;
+          document.body.style.backgroundColor = "red";
+        } else {
+          _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].logoTrack = 870;
+          this.logo.y = 0;
+          this.logo.x = 300;
+          this.old.x = 735;
+          this.old.y = 135;
+          this.hummer.x = 920;
+          this.hummer.y = 400;
+          this.btn.y = 670;
+          this.dec_1.x = 1020;
+          this.dec_1.y = 520;
+
+          if (!_initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingFlag && !_initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingEnd) {
+            menuContainer.forEach(function (item) {
+              item.destroy();
+              menuContainer = [];
+            });
+            _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerX = 800;
+            _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerY = 830;
+            _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].R = 400;
+            this.createMenu(this.resources);
+          } else if (_initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingEnd) {
+            var mediumMenuCoord = [{
+              name: "new_1",
+              x: 612.9,
+              y: 476.45
+            }, {
+              name: "new_2",
+              x: 779.84,
+              y: 430.5
+            }, {
+              name: "new_3",
+              x: 950.56,
+              y: 459.4
+            }];
+            menuContainer.forEach(function (item) {
+              var currentStairs = mediumMenuCoord.find(function (val) {
+                return val.name === item.name;
+              });
+              item.x = currentStairs.x;
+              item.y = currentStairs.y;
+
+              if (item.isChecked) {
+                _this2.ok.x = item.x - 70;
+                _this2.ok.y = item.y + 60;
+              }
+            });
+          }
+
+          document.body.style.backgroundColor = "red";
+        }
+      } else if (windowRatio <= 1.43 && windowRatio > 1) {
+        document.body.style.backgroundColor = "orange";
+        console.log('<= 2 >1');
+
+        if (isFirstResize) {} else {
+          this.logo.y = 20;
+          this.logo.x = 50;
+
+          if (!_initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingFlag && !_initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingEnd) {
+            menuContainer.forEach(function (item) {
+              item.destroy();
+              menuContainer = [];
+            });
+            _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerX = 1100;
+            _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].centerY = 550;
+            _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].R = 410;
+            _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].rangeOfRotation = -Math.PI / 180 * 170;
+            this.createMenu(this.resources);
+          } else if (_initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingEnd) {
+            var largeMenuCoord = [{
+              name: "new_1",
+              x: 813.9,
+              y: 256.32
+            }, {
+              name: "new_2",
+              x: 964.82,
+              y: 162.9
+            }, {
+              name: "new_3",
+              x: 1141.06,
+              y: 142.06
+            }];
+            menuContainer.forEach(function (item) {
+              var currentStairs = largeMenuCoord.find(function (val) {
+                return val.name === item.name;
+              });
+              item.x = currentStairs.x;
+              item.y = currentStairs.y;
+
+              if (item.isChecked) {
+                _this2.ok.x = item.x - 70;
+                _this2.ok.y = item.y + 60;
+              }
+            });
+          }
+        }
+      } else if (windowRatio > 1.43) {
+        document.body.style.backgroundColor = "black";
+        console.log('>= 2');
+        this.wrapper.style.width = "".concat(scaleAdd * this.wrapper.offsetHeight * initRatio + dX, "px");
+      }
+
+      this.wrapper.style.height = "".concat(scaleAdd * this.wrapper.offsetWidth / initRatio + dY, "px");
       var newWidth = Math.ceil(_initData__WEBPACK_IMPORTED_MODULE_1__["initOpt"].initWidth * scaleFactor);
       var newHeight = Math.ceil(_initData__WEBPACK_IMPORTED_MODULE_1__["initOpt"].initHeight * scaleFactor);
       this.app.resize(newWidth, newHeight);
-      this.container.scale.set(scaleFactor);
-    }
+      this.container.scale.set(scaleFactor * scaleAdd);
+      this.container.x = dX;
+      this.container.y = dY;
+      isFirstResize = false;
+    } //-------------------------------------------------    
+
   }, {
     key: "createMenu",
     value: function createMenu(resources) {
-      var _this2 = this;
+      var _this3 = this;
 
       var menuNamesArr = _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].stairs;
 
@@ -47050,10 +47307,10 @@ var GameArea = /*#__PURE__*/function () {
         containerMenu.mask = mask;
         containerMenu.buttonMode = true;
         containerMenu.on('click', function (e) {
-          return _this2.clickOnMenu.call(_this2, e, resources);
+          return _this3.clickOnMenu.call(_this3, e, resources);
         });
         containerMenu.on('tap', function (e) {
-          return _this2.clickOnMenu.call(_this2, e, resources);
+          return _this3.clickOnMenu.call(_this3, e, resources);
         });
         this.container.addChild(containerMenu);
         var menu_ex = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"](resources[nameMenu].texture);
@@ -47101,34 +47358,38 @@ var GameArea = /*#__PURE__*/function () {
         this.insertTexture(finalSceneTexture, resources, this.container);
       }
 
-      this.final_l2.height = this.app.view.height / scaleFactor / this.options.resolution;
-      var centerXfinal = Math.floor(0.5 * (this.app.view.width / scaleFactor / this.options.resolution - this.final_l1.width));
-      var centerYfinal = Math.floor(0.5 * (this.app.view.height / scaleFactor / this.options.resolution - this.final_l1.height));
-      this.final_l1.position.set(centerXfinal, centerYfinal);
+      this.final_l2.height = this.wrapper.offsetHeight / scaleFactor;
+      this.final_l2.y = -dY / scaleFactor;
+      var ratioWidthFinal = this.final_l1.width / this.final_l1.height;
+      this.final_l1.width = this.wrapper.offsetWidth / scaleFactor / scaleAdd * 0.9;
+      this.final_l1.height = this.final_l1.width / ratioWidthFinal; //let cX = 0.5*(this.wrapper.offsetWidth/ scaleFactor - this.final_l1.width);
+
+      var cY = 0.33 * (this.wrapper.offsetHeight / scaleFactor / scaleAdd - this.final_l1.height) - 2 * dY / scaleFactor / scaleAdd;
+      var cX = 0.5 * (this.wrapper.offsetWidth / scaleFactor / scaleAdd - this.final_l1.width - 2 * dX / scaleFactor / scaleAdd);
+      this.final_l1.position.set(cX, cY);
       finalBuildFlag = true;
     }
   }, {
     key: "recolorizeOldMenu",
     value: function recolorizeOldMenu() {
-      var _this3 = this;
+      var _this4 = this;
 
       menuContainer.forEach(function (item) {
-        if (item.isChecked) {
-          var grd = item.children.find(function (val) {
-            return val.name === 'grd';
-          });
-          grd.destroy({
-            children: true,
-            texture: true,
-            baseTexture: true
-          });
+        // if(item.isChecked) {               
+        var grd = item.children.find(function (val) {
+          return val.name === 'grd';
+        });
+        grd.destroy({
+          children: true,
+          texture: true,
+          baseTexture: true
+        });
 
-          var grdCircle = _this3.createCircleGrad(60, "#FFF6DA", "#F6DBB6");
+        var grdCircle = _this4.createCircleGrad(60, "#FFF6DA", "#F6DBB6");
 
-          grdCircle.zIndex = 8;
-          item.isChecked["false"];
-          item.addChild(grdCircle);
-        }
+        grdCircle.zIndex = 8;
+        item.isChecked["false"];
+        item.addChild(grdCircle); // }
       });
     }
   }, {
@@ -47147,8 +47408,12 @@ var GameArea = /*#__PURE__*/function () {
   }, {
     key: "clickOnMenu",
     value: function clickOnMenu(e, resources) {
+      menuContainer.forEach(function (item) {
+        return item.isChecked = false;
+      });
       var currentContainer = e.target;
       currentContainer.isChecked = true;
+      this.colorizeChekedMenu(currentContainer);
 
       if (this.newStairs) {
         this.newStairs.destroy();
@@ -47158,12 +47423,11 @@ var GameArea = /*#__PURE__*/function () {
         this.container.removeChild(this.old);
       }
 
-      this.colorizeChekedMenu(currentContainer);
       this.ok.visible = true;
       this.ok.name = e.target.name;
       this.ok.alpha = 0;
       this.ok.shadeOut = true;
-      this.ok.position.set(currentContainer.x - 70, currentContainer.y + 65);
+      this.ok.position.set(currentContainer.x - 70, currentContainer.y + 60);
       var currentStair = _initData__WEBPACK_IMPORTED_MODULE_1__["menuCircle"].stairs.find(function (item) {
         return item.nameStair === currentContainer.name;
       });
@@ -47205,7 +47469,7 @@ var GameArea = /*#__PURE__*/function () {
       var multer = this.btn.increaseFlag ? this.btn.pace : 1 / this.btn.pace;
       this.btn.curentRatio *= multer;
       this.btn.scale.set(this.btn.curentRatio.toFixed(3));
-      var centerX = Math.floor(0.5 * (this.app.view.width / scaleFactor / this.options.resolution - this.btn.width));
+      var centerX = 0.5 * (this.wrapper.offsetWidth / scaleFactor / scaleAdd - this.btn.width - 2 * dX / scaleFactor / scaleAdd);
       this.btn.x = centerX;
     }
   }, {
@@ -47247,6 +47511,10 @@ var GameArea = /*#__PURE__*/function () {
 
         if (currentRotation - initAngle <= _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].rangeOfRotation) {
           _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingFlag = false;
+          _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].menuMovingEnd = true;
+          menuContainer.forEach(function (item) {
+            return console.log(item.x, item.y, item.name);
+          });
         }
       }
     }
@@ -47407,10 +47675,8 @@ var animation = {
   stairsDuration: 300,
   buildAnimTime: null,
   menuMovingFlag: false,
-  rangeOfRotation: -Math.PI / 180 * 170,
-  btnPace: 1.002,
-  btnCurentRatio: 1,
-  btnRangeRatio: 1.15
+  menuMovingEnd: false,
+  rangeOfRotation: -Math.PI / 180 * 170
 };
 var textureObj = {
   bg: {
@@ -47438,7 +47704,8 @@ var textureObj = {
   },
   hummer: {
     name: "hummer",
-    position: [1020, 300],
+    x: 1020,
+    y: 300,
     alpha: 0,
     visible: false,
     alphaPace: 0.03,
@@ -47457,7 +47724,8 @@ var textureObj = {
   },
   logo: {
     name: "logo",
-    position: [-400, 25],
+    x: -400,
+    y: 25,
     zIndex: 3,
     animationEnd: false
   },
@@ -47481,7 +47749,8 @@ var textureObj = {
     name: "final_l2",
     position: [0, 0],
     zIndex: 9,
-    alpha: 0,
+    //alpha: 0,
+    alpha: 1,
     increment: 0.03,
     edgeAlpha: 0.8
   },
@@ -47489,7 +47758,8 @@ var textureObj = {
     name: "final_l1",
     position: [0, 0],
     zIndex: 10,
-    alpha: 0,
+    //alpha: 0,
+    alpha: 1,
     increment: 0.03
   }
 };

@@ -87,10 +87,9 @@ let animation = {
     stairsDuration: 300,
     buildAnimTime: null,
     menuMovingFlag: false,
+    menuMovingEnd: false,
     rangeOfRotation: -Math.PI/180*170,
-    btnPace: 1.002,
-    btnCurentRatio: 1,
-    btnRangeRatio: 1.15,
+
 };
 
 const textureObj = {
@@ -119,7 +118,8 @@ const textureObj = {
     }, 
     hummer: {
         name: "hummer",
-        position: [1020,300],
+        x: 1020,
+        y: 300,
         alpha: 0,
         visible: false,
         alphaPace: 0.03,
@@ -140,7 +140,8 @@ const textureObj = {
     },
     logo: {
         name: "logo",
-        position: [-400,25],
+        x: -400,
+        y: 25,
         zIndex: 3,
         animationEnd: false
     },
@@ -164,7 +165,8 @@ const textureObj = {
         name: "final_l2",
         position: [0,0],
         zIndex: 9,
-        alpha: 0,
+        //alpha: 0,
+        alpha:1,
         increment: 0.03,
         edgeAlpha: 0.8
     },
@@ -172,7 +174,8 @@ const textureObj = {
         name: "final_l1",
         position: [0, 0],
         zIndex: 10,
-        alpha: 0,
+        //alpha: 0,
+        alpha:1,
         increment: 0.03
     }
 }
