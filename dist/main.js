@@ -47445,13 +47445,12 @@ var dX = 0;
 var dY = 0;
 var menuCircleInit;
 var alphaFilter = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["filters"].AlphaFilter(1);
-alphaFilter.resolution = 4;
+alphaFilter.resolution = 3;
 var shadowFilter = new _pixi_filter_drop_shadow__WEBPACK_IMPORTED_MODULE_3__["DropShadowFilter"]({
   rotation: -90,
   distance: 5,
   blur: 10,
-  quality: 4,
-  resolution: 4
+  resolution: 3
 });
 var resizeTimer = 0;
 

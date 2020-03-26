@@ -21,9 +21,9 @@ let dX = 0;
 let dY = 0;
 let menuCircleInit;
 const alphaFilter = new PIXI.filters.AlphaFilter(1);
-alphaFilter.resolution = 4;
+alphaFilter.resolution = 3;
 
-const shadowFilter = new DropShadowFilter({rotation:-90, distance: 5, blur: 10, quality: 4, resolution: 4});
+const shadowFilter = new DropShadowFilter({rotation:-90, distance: 5, blur: 10, resolution: 3});
 let resizeTimer = 0;
 
 class GameArea {
