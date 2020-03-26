@@ -47445,7 +47445,7 @@ var dX = 0;
 var dY = 0;
 var menuCircleInit;
 var alphaFilter = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["filters"].AlphaFilter(1);
-alphaFilter.resolution = window.devicePixelRatio || 1;
+alphaFilter.resolution = 2;
 var shadowFilter = new _pixi_filter_drop_shadow__WEBPACK_IMPORTED_MODULE_3__["DropShadowFilter"]({
   rotation: -90,
   distance: 5,
@@ -47634,7 +47634,8 @@ var GameArea = /*#__PURE__*/function () {
 
         if (isFirstResize) {
           _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].logo.y = 0;
-          _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].hummer.position.set(920, 400);
+          _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].hummer.x = 920;
+          _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].hummer.y = 400;
           _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].btn.y = 670;
         } else {
           this.logo.position.set(300, 0);

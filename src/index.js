@@ -21,7 +21,8 @@ let dX = 0;
 let dY = 0;
 let menuCircleInit;
 const alphaFilter = new PIXI.filters.AlphaFilter(1);
-alphaFilter.resolution = window.devicePixelRatio || 1;
+alphaFilter.resolution = 2;
+
 const shadowFilter = new DropShadowFilter({rotation:-90, distance: 5, blur: 10});
 let resizeTimer = 0;
 
@@ -202,7 +203,8 @@ class GameArea {
 
             if(isFirstResize) {
                 textureObj.logo.y = 0;
-                textureObj.hummer.position.set(920, 400);
+                textureObj.hummer.x = 920;
+                textureObj.hummer.y = 400;
                 textureObj.btn.y = 670;                           
 
             } else {
