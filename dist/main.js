@@ -47579,18 +47579,24 @@ var GameArea = /*#__PURE__*/function () {
       }
     }
   }, {
+    key: "getScaleFactor",
+    value: function getScaleFactor() {
+      return Math.min(this.wrapper.offsetWidth / _initData__WEBPACK_IMPORTED_MODULE_1__["initOpt"].initWidth, this.wrapper.offsetHeight / _initData__WEBPACK_IMPORTED_MODULE_1__["initOpt"].initHeight);
+    }
+  }, {
     key: "resize",
     value: function resize() {
       clearTimeout(resizeTimer);
       alphaFilter.alpha = 0;
       console.log("windowRatio: ", windowRatio);
-      scaleFactor = Math.min(this.wrapper.offsetWidth / _initData__WEBPACK_IMPORTED_MODULE_1__["initOpt"].initWidth, this.wrapper.offsetHeight / _initData__WEBPACK_IMPORTED_MODULE_1__["initOpt"].initHeight);
       windowRatio = (window.innerWidth / window.innerHeight).toFixed(2);
       scaleAdd = 1;
       dX = 0;
       dY = 0;
 
       if (windowRatio < 0.57) {
+        this.wrapper.style.width = "100%";
+        scaleFactor = this.getScaleFactor();
         scaleAdd = 2.3;
         dX = -800 * scaleFactor;
         dY = 100 * scaleFactor;
@@ -47607,20 +47613,18 @@ var GameArea = /*#__PURE__*/function () {
           _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].logoTrack = 970;
         } else {
           _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].logo.y = -20;
-          this.logo.y = -20;
-          this.logo.x = 360;
+          this.logo.position.set(360, -20);
           this.old.x = 550;
-          this.hummer.x = 730;
-          this.hummer.y = 380;
+          this.hummer.position.set(730, 380);
           this.btn.y = 700;
-          this.dec_1.x = 820;
-          this.dec_1.y = 560;
+          this.dec_1.position.set(820, 560);
           this.resizingCorection();
         }
 
-        this.wrapper.style.width = "100%";
         this.wrapper.style.height = "".concat(scaleAdd * this.wrapper.offsetWidth / initRatio + dY, "px");
       } else if (windowRatio >= 0.57 && windowRatio < 1) {
+        this.wrapper.style.width = "100%";
+        scaleFactor = this.getScaleFactor();
         scaleAdd = 1.45;
         dX = -380 * scaleFactor;
         dY = 30 * scaleFactor;
@@ -47630,48 +47634,48 @@ var GameArea = /*#__PURE__*/function () {
 
         if (isFirstResize) {
           _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].logo.y = 0;
-          _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].hummer.x = 920;
-          _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].hummer.y = 400;
+          _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].hummer.position.set(920, 400);
           _initData__WEBPACK_IMPORTED_MODULE_1__["textureObj"].btn.y = 670;
         } else {
-          this.logo.y = 0;
-          this.logo.x = 300;
-          this.old.x = 735;
-          this.old.y = 135;
-          this.hummer.x = 920;
-          this.hummer.y = 400;
+          this.logo.position.set(300, 0);
+          this.old.position.set(735, 135);
+          this.hummer.position.set(920, 400);
           this.btn.y = 670;
-          this.dec_1.x = 1020;
-          this.dec_1.y = 520;
+          this.dec_1.position.set(1020, 520);
           this.resizingCorection();
         }
 
-        this.wrapper.style.width = "100%";
         this.wrapper.style.height = "".concat(scaleAdd * this.wrapper.offsetWidth / initRatio + dY, "px");
       } else if (windowRatio <= 1.43 && windowRatio >= 1) {
+        this.wrapper.style.width = "100%";
+        scaleFactor = this.getScaleFactor();
         menuCircleInit = _initData__WEBPACK_IMPORTED_MODULE_1__["XLmenuCircle"];
         _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].rangeOfRotation = -Math.PI / 180 * 172;
         this.wrapper.style.height = "".concat(scaleAdd * this.wrapper.offsetWidth / initRatio + dY, "px");
 
         if (!isFirstResize) {
-          this.logo.y = 20;
-          this.logo.x = 50;
+          this.logo.position.set(50, 20);
+          this.old.position.set(735, 135);
+          this.hummer.position.set(1020, 300);
+          this.dec_1.position.set(1020, 520);
           this.resizingCorection();
         }
 
-        this.wrapper.style.width = "100%";
         this.wrapper.style.height = "".concat(scaleAdd * this.wrapper.offsetWidth / initRatio + dY, "px");
       } else if (windowRatio > 1.43) {
+        this.wrapper.style.height = "100vh";
+        scaleFactor = this.getScaleFactor();
         menuCircleInit = _initData__WEBPACK_IMPORTED_MODULE_1__["XLmenuCircle"];
         _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].rangeOfRotation = -Math.PI / 180 * 172;
 
         if (!isFirstResize) {
-          this.logo.y = 20;
-          this.logo.x = 50;
+          this.logo.position.set(50, 20);
+          this.old.position.set(735, 135);
+          this.hummer.position.set(1020, 300);
+          this.dec_1.position.set(1020, 520);
           this.resizingCorection();
         }
 
-        this.wrapper.style.height = "100vh";
         this.wrapper.style.width = "".concat(scaleAdd * this.wrapper.offsetHeight * initRatio + dX, "px");
       }
 
