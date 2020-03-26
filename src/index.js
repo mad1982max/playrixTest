@@ -112,6 +112,7 @@ class GameArea {
 
         this.createMenu(this.resources);            
         this.app.ticker.add(this.ticker.bind(this));
+
     }
 
     resizingCorection() {
@@ -149,7 +150,6 @@ class GameArea {
     }
 
     resize() {
-
         clearTimeout(resizeTimer);
         alphaFilter.alpha = 0;
         windowRatio = (window.innerWidth / window.innerHeight).toFixed(2);
@@ -302,8 +302,7 @@ class GameArea {
             containerMenu.on('click', (e) => this.clickOnMenu.call(this, e, resources));
             containerMenu.on('tap', (e) => this.clickOnMenu.call(this, e, resources));
               
-            this.container.addChild(containerMenu);              
-
+            this.container.addChild(containerMenu);
             let menu_ex = new PIXI.Sprite(resources[nameMenu].texture);
             menu_ex.name = "texture";
             menu_ex.position.set(alignMenu[0],alignMenu[1]);            
@@ -339,9 +338,17 @@ class GameArea {
         this.showFinal(resources);
     }
 
-    correctionPositionFinal() {        
+    correctionPositionFinal() { 
+        if(windowRatio > 1.75) {
+            this.wrapper.style.width = `${scaleAdd * this.wrapper.offsetHeight * initRatio + dX}px`;
+        } else {
+            this.wrapper.style.height = `${scaleAdd * this.wrapper.offsetWidth / initRatio + dY}px`;
+        }       
+        scaleFactor = this.getScaleFactor();        
 
         this.final_l2.height = this.wrapper.offsetHeight / scaleFactor;
+        console.log(scaleFactor, this.wrapper.offsetHeight, this.final_l2.height);
+
         this.final_l2.y = -dY/scaleFactor;
 
         let ratioWidthFinal = this.final_l1.width/this.final_l1.height;
@@ -425,8 +432,7 @@ class GameArea {
     }
 
     showMenu() {
-        animation.menuMovingFlag = true;
-       
+        animation.menuMovingFlag = true;       
     }
 
     menuMovingCircle(containerArr) {
@@ -445,7 +451,6 @@ class GameArea {
         } else if (this.btn.curentRatio < 1){
             this.btn.increaseFlag = true
         }
-
         let multer = this.btn.increaseFlag ? this.btn.pace : 1/this.btn.pace
         this.btn.curentRatio *= multer;
         this.btn.scale.set(this.btn.curentRatio.toFixed(3));
@@ -556,9 +561,7 @@ class GameArea {
         this.logoAppear();
         this.hummerAppear(); 
         this.finishedBuildStair();
-        this.finalAppear(); 
-      
+        this.finalAppear();       
     }
 }
-
 const game = new GameArea();

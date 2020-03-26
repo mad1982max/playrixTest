@@ -47782,7 +47782,15 @@ var GameArea = /*#__PURE__*/function () {
   }, {
     key: "correctionPositionFinal",
     value: function correctionPositionFinal() {
+      if (windowRatio > 1.75) {
+        this.wrapper.style.width = "".concat(scaleAdd * this.wrapper.offsetHeight * initRatio + dX, "px");
+      } else {
+        this.wrapper.style.height = "".concat(scaleAdd * this.wrapper.offsetWidth / initRatio + dY, "px");
+      }
+
+      scaleFactor = this.getScaleFactor();
       this.final_l2.height = this.wrapper.offsetHeight / scaleFactor;
+      console.log(scaleFactor, this.wrapper.offsetHeight, this.final_l2.height);
       this.final_l2.y = -dY / scaleFactor;
       var ratioWidthFinal = this.final_l1.width / this.final_l1.height;
       var widthMulter = windowRatio >= 1 ? 0.6 : 0.9;
