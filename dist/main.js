@@ -47445,11 +47445,13 @@ var dX = 0;
 var dY = 0;
 var menuCircleInit;
 var alphaFilter = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["filters"].AlphaFilter(1);
-alphaFilter.resolution = 2;
+alphaFilter.resolution = 4;
 var shadowFilter = new _pixi_filter_drop_shadow__WEBPACK_IMPORTED_MODULE_3__["DropShadowFilter"]({
   rotation: -90,
   distance: 5,
-  blur: 10
+  blur: 10,
+  quality: 4,
+  resolution: 4
 });
 var resizeTimer = 0;
 
@@ -47511,8 +47513,7 @@ var GameArea = /*#__PURE__*/function () {
     value: function loader(_loader, resources) {
       var _this = this;
 
-      this.resources = resources; //pixiSound.play('theme', { loop: true })        
-
+      this.resources = resources;
       var textureToLoadArr = ["bg", "austin", "ok", "hummer", "dec_1", "dec_2", "btn", "logo", "old"];
 
       for (var _i2 = 0, _textureToLoadArr = textureToLoadArr; _i2 < _textureToLoadArr.length; _i2++) {
@@ -47588,8 +47589,8 @@ var GameArea = /*#__PURE__*/function () {
     value: function resize() {
       clearTimeout(resizeTimer);
       alphaFilter.alpha = 0;
-      console.log("windowRatio: ", windowRatio);
       windowRatio = (window.innerWidth / window.innerHeight).toFixed(2);
+      console.log("windowRatio: ", windowRatio);
       scaleAdd = 1;
       dX = 0;
       dY = 0;

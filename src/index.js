@@ -21,9 +21,9 @@ let dX = 0;
 let dY = 0;
 let menuCircleInit;
 const alphaFilter = new PIXI.filters.AlphaFilter(1);
-alphaFilter.resolution = 2;
+alphaFilter.resolution = 4;
 
-const shadowFilter = new DropShadowFilter({rotation:-90, distance: 5, blur: 10});
+const shadowFilter = new DropShadowFilter({rotation:-90, distance: 5, blur: 10, quality: 4, resolution: 4});
 let resizeTimer = 0;
 
 class GameArea {
@@ -78,9 +78,7 @@ class GameArea {
     }
 
     loader(loader, resources) {
-        this.resources = resources;
-        
-        //pixiSound.play('theme', { loop: true })        
+        this.resources = resources;     
         
         let textureToLoadArr = ["bg", "austin", "ok", "hummer", "dec_1", "dec_2", "btn", "logo", "old"];
 
@@ -154,9 +152,8 @@ class GameArea {
 
         clearTimeout(resizeTimer);
         alphaFilter.alpha = 0;
-        console.log("windowRatio: ", windowRatio);
-
         windowRatio = (window.innerWidth / window.innerHeight).toFixed(2);
+        console.log("windowRatio: ", windowRatio);
        
         scaleAdd = 1;
         dX = 0;
@@ -342,7 +339,8 @@ class GameArea {
         this.showFinal(resources);
     }
 
-    correctionPositionFinal() {
+    correctionPositionFinal() {        
+
         this.final_l2.height = this.wrapper.offsetHeight / scaleFactor;
         this.final_l2.y = -dY/scaleFactor;
 
