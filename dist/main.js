@@ -47933,7 +47933,7 @@ var GameArea = /*#__PURE__*/function () {
       if (this.newStairs && this.newStairs.isCreated && !this.newStairs.animationEnd) {
         var currentTime = Date.now();
         var d = currentTime - _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].buildAnimTime;
-        if (this.newStairs.alpha < 1) this.newStairs.alpha += 0.05;
+        if (this.newStairs.alpha < 1) this.newStairs.alpha += 0.055;
 
         if (this.newStairs.y >= this.newStairs.initY || d >= _initData__WEBPACK_IMPORTED_MODULE_1__["animation"].stairsDuration) {
           this.newStairs.y = this.newStairs.initY;

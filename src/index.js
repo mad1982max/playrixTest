@@ -471,7 +471,7 @@ class GameArea {
         if (this.newStairs && this.newStairs.isCreated && !this.newStairs.animationEnd) {
             let currentTime = Date.now();
             let d = currentTime - animation.buildAnimTime;
-            if (this.newStairs.alpha < 1) this.newStairs.alpha +=0.05;
+            if (this.newStairs.alpha < 1) this.newStairs.alpha +=0.055;
             if (this.newStairs.y >= this.newStairs.initY || d >= animation.stairsDuration) {
                 this.newStairs.y = this.newStairs.initY;
                 this.newStairs.animationEnd = true;
